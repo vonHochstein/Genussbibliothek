@@ -1,4 +1,4 @@
-// Genussdatenbank – Login (GI-Flow) im WB-Look
+// Genussbibliothek – Login (GI-Flow) im WB-Look
 // Stand: 2025_12_30
 
 const SUPABASE_URL = "https://dffqempnuqymcofvgkxx.supabase.co";
