@@ -108,7 +108,7 @@
 
     function getAppBasePath() {
       const path = window.location.pathname || "";
-      const repoSegment = "/Genussdatenbank/";
+      const repoSegment = "/Genussbibliothek/";
       if (window.location.hostname.includes("github.io") && path.includes(repoSegment)) {
         return repoSegment;
       }

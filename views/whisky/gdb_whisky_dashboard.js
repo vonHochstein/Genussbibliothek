@@ -524,7 +524,7 @@ function normalizeWorldSvgMarkup(svgText) {
 
       const finalViewBox = viewBoxValue || (widthValue && heightValue ? `0 0 ${widthValue} ${heightValue}` : "0 0 1405 601");
 
-      return `<svg${cleanedAttrs} viewBox="${finalViewBox}" preserveAspectRatio="${preserveAspectRatioValue}" class="dashboard-map-svg" id="dashboardWorldSvg" aria-label="Herkunftsweltkarte der Genussdatenbank" role="img">`;
+      return `<svg${cleanedAttrs} viewBox="${finalViewBox}" preserveAspectRatio="${preserveAspectRatioValue}" class="dashboard-map-svg" id="dashboardWorldSvg" aria-label="Herkunftsweltkarte der Genussbibliothek" role="img">`;
     });
 }
 
@@ -1753,7 +1753,7 @@ function normalizeGermanySvgMarkup(svgText) {
 
       const finalViewBox = viewBoxValue || (widthValue && heightValue ? `0 0 ${widthValue} ${heightValue}` : "0 0 591.504 800.504");
 
-      return `<svg${cleanedAttrs} viewBox="${finalViewBox}" preserveAspectRatio="${preserveAspectRatioValue}" class="dashboard-map-svg dashboard-map-svg--germany" id="dashboardGermanySvg" aria-label="Deutschlandkarte der Genussdatenbank" role="img">`;
+      return `<svg${cleanedAttrs} viewBox="${finalViewBox}" preserveAspectRatio="${preserveAspectRatioValue}" class="dashboard-map-svg dashboard-map-svg--germany" id="dashboardGermanySvg" aria-label="Deutschlandkarte der Genussbibliothek" role="img">`;
     });
 }
 
@@ -1785,7 +1785,7 @@ function normalizeScotlandSvgMarkup(svgText) {
 
       const finalViewBox = viewBoxValue || (widthValue && heightValue ? `0 0 ${widthValue} ${heightValue}` : "0 0 700 700");
 
-      return `<svg${cleanedAttrs} viewBox="${finalViewBox}" preserveAspectRatio="${preserveAspectRatioValue}" class="dashboard-map-svg dashboard-map-svg--scotland" id="dashboardScotlandSvg" aria-label="Schottlandkarte der Genussdatenbank" role="img">`;
+      return `<svg${cleanedAttrs} viewBox="${finalViewBox}" preserveAspectRatio="${preserveAspectRatioValue}" class="dashboard-map-svg dashboard-map-svg--scotland" id="dashboardScotlandSvg" aria-label="Schottlandkarte der Genussbibliothek" role="img">`;
     });
 }
 
@@ -1817,7 +1817,7 @@ function normalizeUsaSvgMarkup(svgText) {
 
       const finalViewBox = viewBoxValue || (widthValue && heightValue ? `0 0 ${widthValue} ${heightValue}` : "0 0 958.691 592.79");
 
-      return `<svg${cleanedAttrs} viewBox="${finalViewBox}" preserveAspectRatio="${preserveAspectRatioValue}" class="dashboard-map-svg dashboard-map-svg--usa" id="dashboardUsaSvg" aria-label="USA-Karte der Genussdatenbank" role="img">`;
+      return `<svg${cleanedAttrs} viewBox="${finalViewBox}" preserveAspectRatio="${preserveAspectRatioValue}" class="dashboard-map-svg dashboard-map-svg--usa" id="dashboardUsaSvg" aria-label="USA-Karte der Genussbibliothek" role="img">`;
     });
 }
 
@@ -1849,7 +1849,7 @@ function normalizeUkSvgMarkup(svgText) {
 
       const finalViewBox = viewBoxValue || (widthValue && heightValue ? `0 0 ${widthValue} ${heightValue}` : "0 0 885.546 1368.581");
 
-      return `<svg${cleanedAttrs} viewBox="${finalViewBox}" preserveAspectRatio="${preserveAspectRatioValue}" class="dashboard-map-svg dashboard-map-svg--uk" id="dashboardUkSvg" aria-label="Großbritannien-und-Irland-Karte der Genussdatenbank" role="img">`;
+      return `<svg${cleanedAttrs} viewBox="${finalViewBox}" preserveAspectRatio="${preserveAspectRatioValue}" class="dashboard-map-svg dashboard-map-svg--uk" id="dashboardUkSvg" aria-label="Großbritannien-und-Irland-Karte der Genussbibliothek" role="img">`;
     });
 }
 
