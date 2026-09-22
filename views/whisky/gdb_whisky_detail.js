@@ -242,6 +242,8 @@ function fmtDE(iso) {
 
   let savedImageUrl = "";
   let originalImageUrl = "";
+  let savedThumbnailUrl = "";
+  let originalThumbnailUrl = "";
   let pendingImageFile = null;
   let deleteImageOnSave = false;
 
@@ -639,11 +641,13 @@ function fmtDE(iso) {
     }
 
     const imagePath = getStoragePathFromPublicUrl(savedImageUrl || originalImageUrl || "");
+    const thumbnailPath = getStoragePathFromPublicUrl(savedThumbnailUrl || originalThumbnailUrl || "");
+    const storagePaths = [imagePath, thumbnailPath].filter(Boolean);
 
-    if (imagePath && parentSupabase?.storage?.from) {
+    if (storagePaths.length && parentSupabase?.storage?.from) {
       const { error: storageError } = await parentSupabase.storage
         .from("whiskys")
-        .remove([imagePath]);
+        .remove(storagePaths);
 
       if (storageError) {
         throw storageError;
@@ -934,16 +938,22 @@ function closeDeleteWhiskyModal() {
     }
 
     const oldPath = getStoragePathFromPublicUrl(originalImageUrl);
+    const oldThumbnailPath = getStoragePathFromPublicUrl(originalThumbnailUrl);
+    const oldPaths = [oldPath, oldThumbnailPath].filter(Boolean);
 
     if (deleteImageOnSave) {
-      if (oldPath) {
-        await parentSupabase.storage.from("whiskys").remove([oldPath]);
-      }
-
-      const rows = await saveMasterDataToDb({ image_url: null });
+      const rows = await saveMasterDataToDb({ image_url: null, thumbnail_url: null });
       const row = Array.isArray(rows) ? rows[0] : null;
       savedImageUrl = (row?.image_url ?? "").toString();
+      savedThumbnailUrl = (row?.thumbnail_url ?? "").toString();
       originalImageUrl = savedImageUrl;
+      originalThumbnailUrl = savedThumbnailUrl;
+
+      if (oldPaths.length) {
+        const { error: cleanupError } = await parentSupabase.storage.from("whiskys").remove(oldPaths);
+        if (cleanupError) throw cleanupError;
+      }
+
       pendingImageFile = null;
       deleteImageOnSave = false;
       return savedImageUrl;
@@ -953,39 +963,74 @@ function closeDeleteWhiskyModal() {
       return savedImageUrl;
     }
 
+    if (!window.GdbWhiskyImages?.createThumbnail) {
+      throw new Error("Thumbnail-Erzeugung ist nicht verfügbar");
+    }
+
     const ext = (pendingImageFile.name.split(".").pop() || "jpg").toLowerCase();
     const safeExt = ext.replace(/[^a-z0-9]/g, "") || "jpg";
-    const filePath = `whisky_${id}_${Date.now()}.${safeExt}`;
+    const timestamp = Date.now();
+    const filePath = `whisky_${id}_${timestamp}.${safeExt}`;
+    const thumbnailPath = `thumbnails/whisky_${id}_${timestamp}.webp`;
+    const thumbnailBlob = await window.GdbWhiskyImages.createThumbnail(pendingImageFile);
+    const uploadedPaths = [];
+    let imageUrlsUpdated = false;
 
-    const { error: uploadError } = await parentSupabase.storage
-      .from("whiskys")
-      .upload(filePath, pendingImageFile, {
-        cacheControl: "3600",
-        upsert: true,
-        contentType: pendingImageFile.type || undefined
+    try {
+      const { error: uploadError } = await parentSupabase.storage
+        .from("whiskys")
+        .upload(filePath, pendingImageFile, {
+          cacheControl: "31536000",
+          upsert: true,
+          contentType: pendingImageFile.type || undefined
+        });
+      if (uploadError) throw uploadError;
+      uploadedPaths.push(filePath);
+
+      const { error: thumbnailUploadError } = await parentSupabase.storage
+        .from("whiskys")
+        .upload(thumbnailPath, thumbnailBlob, {
+          cacheControl: "31536000",
+          upsert: true,
+          contentType: "image/webp"
+        });
+      if (thumbnailUploadError) throw thumbnailUploadError;
+      uploadedPaths.push(thumbnailPath);
+
+      const publicUrl = parentSupabase.storage.from("whiskys").getPublicUrl(filePath).data?.publicUrl || "";
+      const thumbnailUrl = parentSupabase.storage.from("whiskys").getPublicUrl(thumbnailPath).data?.publicUrl || "";
+      if (!publicUrl || !thumbnailUrl) throw new Error("Bild-URLs konnten nicht erzeugt werden");
+
+      const rows = await saveMasterDataToDb({
+        image_url: publicUrl,
+        thumbnail_url: thumbnailUrl
       });
+      const row = Array.isArray(rows) ? rows[0] : null;
 
-    if (uploadError) {
-      throw uploadError;
+      savedImageUrl = (row?.image_url ?? publicUrl).toString();
+      savedThumbnailUrl = (row?.thumbnail_url ?? thumbnailUrl).toString();
+      originalImageUrl = savedImageUrl;
+      originalThumbnailUrl = savedThumbnailUrl;
+      imageUrlsUpdated = true;
+
+      if (oldPaths.length) {
+        const pathsToRemove = oldPaths.filter((path) => path !== filePath && path !== thumbnailPath);
+        if (pathsToRemove.length) {
+          const { error: cleanupError } = await parentSupabase.storage.from("whiskys").remove(pathsToRemove);
+          if (cleanupError) throw cleanupError;
+        }
+      }
+
+      pendingImageFile = null;
+      deleteImageOnSave = false;
+      return savedImageUrl;
+    } catch (error) {
+      if (uploadedPaths.length && !imageUrlsUpdated) {
+        const { error: cleanupError } = await parentSupabase.storage.from("whiskys").remove(uploadedPaths);
+        if (cleanupError) console.error("Neue Bilddateien konnten nicht vollständig bereinigt werden:", cleanupError);
+      }
+      throw error;
     }
-
-    const { data: publicUrlData } = parentSupabase.storage
-      .from("whiskys")
-      .getPublicUrl(filePath);
-
-    const publicUrl = publicUrlData?.publicUrl || "";
-    const rows = await saveMasterDataToDb({ image_url: publicUrl || null });
-    const row = Array.isArray(rows) ? rows[0] : null;
-
-    if (oldPath && oldPath !== filePath) {
-      await parentSupabase.storage.from("whiskys").remove([oldPath]);
-    }
-
-    savedImageUrl = (row?.image_url ?? publicUrl ?? "").toString();
-    originalImageUrl = savedImageUrl;
-    pendingImageFile = null;
-    deleteImageOnSave = false;
-    return savedImageUrl;
   }
   function syncNasUi() {
     if (!editAgeYearsEl) return;
@@ -1179,6 +1224,7 @@ if (btnEditMasterData) {
         originalCollector = savedCollector;
         originalBottleOutturn = savedBottleOutturn;
         originalImageUrl = savedImageUrl;
+        originalThumbnailUrl = savedThumbnailUrl;
 
         if (masterDataEditHintEl) {
           masterDataEditHintEl.textContent = defaultMasterDataHintText;
@@ -1341,6 +1387,7 @@ if (btnEditMasterData) {
         originalCollector = savedCollector;
         originalBottleOutturn = savedBottleOutturn;
         originalImageUrl = savedImageUrl;
+        originalThumbnailUrl = savedThumbnailUrl;
 
         if (imgEl) {
           imgEl.src = savedImageUrl || DEFAULT_IMAGE_URL;
@@ -2357,7 +2404,7 @@ document.addEventListener("keydown", (e) => {
       const url =
         `${SUPABASE_URL}/rest/v1/gdb_whiskys` +
         `?id=eq.${encodeURIComponent(id)}` +
-        `&select=name,distillery,bottler,country,region,flag_url,region_flag_url,image_url,age_years,volume_ml,abv,fasstyp,price_eur,price_per_liter_eur,bottle_outturn,provisional,collector,created_at,updated_at,created_by,updated_by`;
+        `&select=name,distillery,bottler,country,region,flag_url,region_flag_url,image_url,thumbnail_url,age_years,volume_ml,abv,fasstyp,price_eur,price_per_liter_eur,bottle_outturn,provisional,collector,created_at,updated_at,created_by,updated_by`;
       const res = await fetch(url, {
         headers: {
           apikey: SUPABASE_ANON_KEY,
@@ -2381,8 +2428,11 @@ document.addEventListener("keydown", (e) => {
       const regionFlagUrl   = row.region_flag_url;
 
       const imageUrl        = rows?.[0]?.image_url;
+      const thumbnailUrl    = rows?.[0]?.thumbnail_url;
       savedImageUrl         = (imageUrl ?? "").toString();
+      savedThumbnailUrl     = (thumbnailUrl ?? "").toString();
       originalImageUrl      = savedImageUrl;
+      originalThumbnailUrl  = savedThumbnailUrl;
 
       const whiskyCreatedAt = rows?.[0]?.created_at || "";
       const whiskyUpdatedAt = rows?.[0]?.updated_at || "";
