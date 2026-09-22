@@ -271,18 +271,14 @@
     return lines.join('\n') || 'Whisky angelegt';
   }
 
-  async function saveImageToStorage(newId) {
+  async function saveImageToStorage(newId, thumbnailBlob) {
     const parentSupabase = window.parent?.supabaseClient || window.parent?.supabase || window.supabaseClient || window.supabase || null;
     if (!parentSupabase?.storage?.from || !pendingImageFile) return null;
-    if (!window.GdbWhiskyImages?.createThumbnail) {
-      throw new Error('Thumbnail-Erzeugung ist nicht verfügbar');
-    }
 
     const ext = (pendingImageFile.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
     const timestamp = Date.now();
     const originalPath = `whisky_${newId}_${timestamp}.${ext}`;
     const thumbnailPath = `thumbnails/whisky_${newId}_${timestamp}.webp`;
-    const thumbnailBlob = await window.GdbWhiskyImages.createThumbnail(pendingImageFile);
     const uploadedPaths = [];
 
     try {
@@ -327,6 +323,41 @@
     if (!parentSupabase?.storage?.from || !paths?.length) return;
     const { error } = await parentSupabase.storage.from('whiskys').remove(paths);
     if (error) console.error('Bild-Upload konnte nicht vollständig bereinigt werden:', error);
+  }
+
+  async function patchImageUrls(whiskyId, imageUrl, thumbnailUrl, accessToken) {
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/gdb_whiskys?id=eq.${encodeURIComponent(whiskyId)}`, {
+      method: 'PATCH',
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${accessToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        image_url: imageUrl,
+        thumbnail_url: thumbnailUrl
+      })
+    });
+
+    if (!res.ok) {
+      throw new Error(`Bild-URLs speichern fehlgeschlagen (HTTP ${res.status})`);
+    }
+  }
+
+  async function rollbackCreatedWhisky(whiskyId, accessToken) {
+    if (!whiskyId || !accessToken) return;
+
+    const res = await fetch(`${SUPABASE_URL}/rest/v1/gdb_whiskys?id=eq.${encodeURIComponent(whiskyId)}`, {
+      method: 'DELETE',
+      headers: {
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${accessToken}`
+      }
+    });
+
+    if (!res.ok) {
+      throw new Error(`Unvollständigen Whisky zurückrollen fehlgeschlagen (HTTP ${res.status})`);
+    }
   }
 
   function setHint(text = '', kind = 'muted') {
@@ -382,18 +413,20 @@
     btnCancel.disabled = true;
     setHint('Speichere…');
     let uploadedImagePaths = [];
-    let whiskyCreated = false;
+    let createdWhiskyId = null;
+    let accessToken = null;
+    let creationCompleted = false;
 
     try {
+      let thumbnailBlob = null;
       if (pendingImageFile && !deleteImageOnSave) {
-        const uploadedImages = await saveImageToStorage(payload.id);
-        if (!uploadedImages) throw new Error('Bild-Upload fehlgeschlagen');
-        payload.image_url = uploadedImages.originalUrl;
-        payload.thumbnail_url = uploadedImages.thumbnailUrl;
-        uploadedImagePaths = uploadedImages.uploadedPaths;
+        if (!window.GdbWhiskyImages?.createThumbnail) {
+          throw new Error('Thumbnail-Erzeugung ist nicht verfügbar');
+        }
+        thumbnailBlob = await window.GdbWhiskyImages.createThumbnail(pendingImageFile);
       }
 
-      const accessToken = await getAccessToken();
+      accessToken = await getAccessToken();
       const res = await fetch(`${SUPABASE_URL}/rest/v1/gdb_whiskys`, {
         method: 'POST',
         headers: {
@@ -408,7 +441,16 @@
       const data = await res.json();
       const newId = data?.[0]?.id;
       if (!newId) throw new Error('Keine ID zurückgegeben');
-      whiskyCreated = true;
+      createdWhiskyId = newId;
+
+      if (thumbnailBlob) {
+        const uploadedImages = await saveImageToStorage(newId, thumbnailBlob);
+        if (!uploadedImages) throw new Error('Bild-Upload fehlgeschlagen');
+        uploadedImagePaths = uploadedImages.uploadedPaths;
+        await patchImageUrls(newId, uploadedImages.originalUrl, uploadedImages.thumbnailUrl, accessToken);
+      }
+
+      creationCompleted = true;
 
       await writeLogEntry({
         action: 'create',
@@ -421,10 +463,17 @@
       window.location.href = `gdb_whisky_detail.html?id=${encodeURIComponent(newId)}&t=${Date.now()}`;
     } catch (err) {
       console.error(err);
-      if (!whiskyCreated && uploadedImagePaths.length) {
+      if (!creationCompleted && uploadedImagePaths.length) {
         await cleanupUploadedImages(uploadedImagePaths);
       }
-      setHint('Speichern fehlgeschlagen', 'err');
+      if (!creationCompleted && createdWhiskyId) {
+        try {
+          await rollbackCreatedWhisky(createdWhiskyId, accessToken);
+        } catch (rollbackError) {
+          console.error(rollbackError);
+        }
+      }
+      setHint(`Speichern fehlgeschlagen: ${err?.message || 'Unbekannter Fehler'}`, 'err');
     } finally {
       btnSave.disabled = false;
       btnCancel.disabled = false;
