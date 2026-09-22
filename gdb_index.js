@@ -276,6 +276,7 @@ function showApp(user) {
 }
 
 function showLock() {
+  document.body.classList.remove("whisky-view-active");
   if (preloginIntro) preloginIntro.style.display = "grid";
   if (lockscreen) lockscreen.style.display = "block";
   if (changelog) changelog.style.display = "block";
@@ -681,6 +682,7 @@ async function loadWhiskyTileStats() {
 }
 
 function showDashboard() {
+  document.body.classList.remove("whisky-view-active");
   whiskyListView?.classList.add("hidden");
   if (dashboard) dashboard.style.display = "block";
   if (app) app.style.display = "block";
@@ -802,6 +804,7 @@ function hideAllViews() {
 }
 
 function showWhiskyList() {
+  document.body.classList.add("whisky-view-active");
   if (dashboard) dashboard.style.display = "none";
   if (app) app.style.display = "none";
   hideAllViews();
