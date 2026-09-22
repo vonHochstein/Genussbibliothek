@@ -432,7 +432,14 @@ async function loginWithAuth() {
   }
 }
 
-function logout() {
+async function logout() {
+  try {
+    const { error } = await supabaseClient.auth.signOut();
+    if (error) throw error;
+  } catch (error) {
+    console.error("Abmeldung bei Supabase fehlgeschlagen:", error);
+  }
+
   // 1) State löschen
   setCurrentUser(null);
 
@@ -449,13 +456,23 @@ function logout() {
   setMsg("");
 }
 
-function init() {
-  const stored = getStoredUser();
-  if (stored) {
-    setCurrentUser(stored);
-    void refreshCurrentPermissions(stored);
-  } else {
-    showLock();
+async function init() {
+  showLock();
+
+  try {
+    const { data, error } = await supabaseClient.auth.getUser();
+    const authUser = data?.user;
+    const stored = getStoredUser();
+
+    if (!error && authUser?.id && stored?.id === authUser.id) {
+      setCurrentUser(stored);
+      void refreshCurrentPermissions(stored);
+    } else {
+      setCurrentUser(null);
+    }
+  } catch (error) {
+    console.error("Supabase-Session konnte nicht geprüft werden:", error);
+    setCurrentUser(null);
   }
 
   enterBtn?.addEventListener("click", (e) => {
@@ -1162,4 +1179,3 @@ compareStockUserList?.addEventListener("change", (e) => {
 
   });
 })();
-
