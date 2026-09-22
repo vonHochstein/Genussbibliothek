@@ -2,6 +2,7 @@
   const MAX_THUMBNAIL_WIDTH = 320;
   const MAX_THUMBNAIL_HEIGHT = 640;
   const WEBP_QUALITY = 0.80;
+  const JPEG_QUALITY = 0.80;
 
   function getTargetSize(width, height) {
     const scale = Math.min(
@@ -16,16 +17,116 @@
     };
   }
 
-  function canvasToWebpBlob(canvas) {
-    return new Promise((resolve, reject) => {
-      canvas.toBlob((blob) => {
-        if (!blob || blob.type !== "image/webp") {
-          reject(new Error("WebP-Thumbnail konnte nicht erzeugt werden."));
-          return;
+  async function normalizeWebpBlob(blob) {
+    if (!blob) return null;
+    if ((blob.type || "").toLowerCase() === "image/webp") return blob;
+
+    try {
+      const header = new Uint8Array(await blob.slice(0, 12).arrayBuffer());
+      const isWebp =
+        header.length >= 12 &&
+        String.fromCharCode(...header.slice(0, 4)) === "RIFF" &&
+        String.fromCharCode(...header.slice(8, 12)) === "WEBP";
+      return isWebp ? new Blob([blob], { type: "image/webp" }) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function normalizeJpegBlob(blob) {
+    if (!blob) return null;
+    const type = (blob.type || "").toLowerCase();
+    if (type === "image/jpeg" || type === "image/jpg") {
+      return type === "image/jpeg" ? blob : new Blob([blob], { type: "image/jpeg" });
+    }
+
+    try {
+      const header = new Uint8Array(await blob.slice(0, 3).arrayBuffer());
+      const isJpeg = header.length >= 3 && header[0] === 0xff && header[1] === 0xd8 && header[2] === 0xff;
+      return isJpeg ? new Blob([blob], { type: "image/jpeg" }) : null;
+    } catch {
+      return null;
+    }
+  }
+
+  function dataUrlToBlob(dataUrl, expectedType) {
+    const separatorIndex = dataUrl.indexOf(",");
+    if (separatorIndex === -1) return null;
+
+    const header = dataUrl.slice(0, separatorIndex);
+    if (!header.toLowerCase().startsWith(`data:${expectedType}`)) return null;
+
+    const encoded = dataUrl.slice(separatorIndex + 1);
+    const binary = header.includes(";base64")
+      ? atob(encoded)
+      : decodeURIComponent(encoded);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i += 1) {
+      bytes[i] = binary.charCodeAt(i);
+    }
+    return new Blob([bytes], { type: expectedType });
+  }
+
+  async function canvasToWebpBlob(canvas) {
+    if (typeof canvas.toBlob === "function") {
+      const blob = await new Promise((resolve) => {
+        try {
+          canvas.toBlob(resolve, "image/webp", WEBP_QUALITY);
+        } catch {
+          resolve(null);
         }
-        resolve(blob);
-      }, "image/webp", WEBP_QUALITY);
-    });
+      });
+      const normalizedBlob = await normalizeWebpBlob(blob);
+      if (normalizedBlob) return normalizedBlob;
+    }
+
+    if (typeof OffscreenCanvas === "function") {
+      try {
+        const offscreen = new OffscreenCanvas(canvas.width, canvas.height);
+        const context = offscreen.getContext("2d");
+        if (context) {
+          context.drawImage(canvas, 0, 0);
+          const blob = await offscreen.convertToBlob({
+            type: "image/webp",
+            quality: WEBP_QUALITY
+          });
+          const normalizedBlob = await normalizeWebpBlob(blob);
+          if (normalizedBlob) return normalizedBlob;
+        }
+      } catch {
+        // Der Data-URL-Fallback wird als Nächstes versucht.
+      }
+    }
+
+    try {
+      const blob = dataUrlToBlob(canvas.toDataURL("image/webp", WEBP_QUALITY), "image/webp");
+      const normalizedBlob = await normalizeWebpBlob(blob);
+      if (normalizedBlob) return normalizedBlob;
+    } catch {
+      // Die eindeutige Fehlermeldung folgt unterhalb.
+    }
+
+    if (typeof canvas.toBlob === "function") {
+      const blob = await new Promise((resolve) => {
+        try {
+          canvas.toBlob(resolve, "image/jpeg", JPEG_QUALITY);
+        } catch {
+          resolve(null);
+        }
+      });
+      const normalizedBlob = await normalizeJpegBlob(blob);
+      if (normalizedBlob) return normalizedBlob;
+    }
+
+    try {
+      const blob = dataUrlToBlob(canvas.toDataURL("image/jpeg", JPEG_QUALITY), "image/jpeg");
+      const normalizedBlob = await normalizeJpegBlob(blob);
+      if (normalizedBlob) return normalizedBlob;
+    } catch {
+      // Die eindeutige Fehlermeldung folgt unterhalb.
+    }
+
+    throw new Error("Thumbnail konnte weder als WebP noch als JPEG erzeugt werden.");
   }
 
   function loadImageFallback(file) {

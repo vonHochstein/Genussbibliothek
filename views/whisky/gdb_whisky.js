@@ -325,7 +325,7 @@ function renderList(list){
     const cardClass =
       (w.provisional ? "provisional" : (w.collector ? "collector" : ""));
 
-    const imgSrc = w.image_url || DEFAULT_IMAGE_URL;
+    const imgSrc = w.thumbnail_url || w.image_url || DEFAULT_IMAGE_URL;
 
     // Bestand-Balken:
     // - mein Bestand: gdb_whisky_user.stock für CURRENT_UID (ml)
@@ -360,7 +360,7 @@ function renderList(list){
         <div class="row whisky-row">
           <div class="whisky-img-col">
             <div class="whisky-img-wrap">
-              <img loading="lazy" src="${imgSrc}" class="whisky-img" alt="">
+              <img loading="lazy" decoding="async" src="${imgSrc}" class="whisky-img" alt="">
             </div>
 
             ${w.collector ? `
@@ -617,6 +617,7 @@ async function boot(){
       "price_eur",
       "price_per_liter_eur",
       "image_url",
+      "thumbnail_url",
       "provisional",
       "collector",
       "created_at",

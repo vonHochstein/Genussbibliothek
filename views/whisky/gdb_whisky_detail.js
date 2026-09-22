@@ -584,6 +584,15 @@ function fmtDE(iso) {
     return window.parent?.GdbPermissions?.requirePermission?.('whisky', 'delete') ?? true;
   }
 
+  async function getResponseErrorMessage(response) {
+    try {
+      const payload = await response.json();
+      return payload?.message || payload?.error_description || payload?.error || `HTTP ${response.status}`;
+    } catch (_) {
+      return `HTTP ${response.status}`;
+    }
+  }
+
   async function saveMasterDataToDb(nextMasterData) {
     const parentSupabase = window.parent?.supabaseClient || window.supabaseClient || null;
     const currentUser = resolveCurrentUser();
@@ -620,7 +629,7 @@ function fmtDE(iso) {
     );
 
     if (!res.ok) {
-      throw new Error(`Stammdaten speichern fehlgeschlagen (HTTP ${res.status})`);
+      throw new Error(`Stammdaten speichern fehlgeschlagen: ${await getResponseErrorMessage(res)}`);
     }
 
     return await res.json();
@@ -971,8 +980,11 @@ function closeDeleteWhiskyModal() {
     const safeExt = ext.replace(/[^a-z0-9]/g, "") || "jpg";
     const timestamp = Date.now();
     const filePath = `whisky_${id}_${timestamp}.${safeExt}`;
-    const thumbnailPath = `thumbnails/whisky_${id}_${timestamp}.webp`;
     const thumbnailBlob = await window.GdbWhiskyImages.createThumbnail(pendingImageFile);
+    const thumbnailIsWebp = thumbnailBlob.type === "image/webp";
+    const thumbnailExtension = thumbnailIsWebp ? "webp" : "jpg";
+    const thumbnailContentType = thumbnailIsWebp ? "image/webp" : "image/jpeg";
+    const thumbnailPath = `thumbnails/whisky_${id}_${timestamp}.${thumbnailExtension}`;
     const uploadedPaths = [];
     let imageUrlsUpdated = false;
 
@@ -984,7 +996,9 @@ function closeDeleteWhiskyModal() {
           upsert: true,
           contentType: pendingImageFile.type || undefined
         });
-      if (uploadError) throw uploadError;
+      if (uploadError) {
+        throw new Error(`Originalbild-Upload fehlgeschlagen: ${uploadError.message || "Unbekannter Storage-Fehler"}`);
+      }
       uploadedPaths.push(filePath);
 
       const { error: thumbnailUploadError } = await parentSupabase.storage
@@ -992,9 +1006,11 @@ function closeDeleteWhiskyModal() {
         .upload(thumbnailPath, thumbnailBlob, {
           cacheControl: "31536000",
           upsert: true,
-          contentType: "image/webp"
+          contentType: thumbnailContentType
         });
-      if (thumbnailUploadError) throw thumbnailUploadError;
+      if (thumbnailUploadError) {
+        throw new Error(`Thumbnail-Upload fehlgeschlagen: ${thumbnailUploadError.message || "Unbekannter Storage-Fehler"}`);
+      }
       uploadedPaths.push(thumbnailPath);
 
       const publicUrl = parentSupabase.storage.from("whiskys").getPublicUrl(filePath).data?.publicUrl || "";
@@ -1425,7 +1441,7 @@ if (btnEditMasterData) {
         console.error(err);
         if (masterDataEditHintEl) {
           masterDataEditHintEl.hidden = false;
-          masterDataEditHintEl.textContent = "Speichern fehlgeschlagen";
+          masterDataEditHintEl.textContent = `Speichern fehlgeschlagen: ${err?.message || "Unbekannter Fehler"}`;
         }
       } finally {
         if (btnEditMasterData) btnEditMasterData.disabled = false;

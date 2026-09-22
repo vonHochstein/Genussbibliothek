@@ -278,7 +278,10 @@
     const ext = (pendingImageFile.name.split('.').pop() || 'jpg').toLowerCase().replace(/[^a-z0-9]/g, '') || 'jpg';
     const timestamp = Date.now();
     const originalPath = `whisky_${newId}_${timestamp}.${ext}`;
-    const thumbnailPath = `thumbnails/whisky_${newId}_${timestamp}.webp`;
+    const thumbnailIsWebp = thumbnailBlob.type === 'image/webp';
+    const thumbnailExtension = thumbnailIsWebp ? 'webp' : 'jpg';
+    const thumbnailContentType = thumbnailIsWebp ? 'image/webp' : 'image/jpeg';
+    const thumbnailPath = `thumbnails/whisky_${newId}_${timestamp}.${thumbnailExtension}`;
     const uploadedPaths = [];
 
     try {
@@ -299,7 +302,7 @@
         .upload(thumbnailPath, thumbnailBlob, {
           cacheControl: '31536000',
           upsert: true,
-          contentType: 'image/webp'
+          contentType: thumbnailContentType
         });
       if (thumbnailUploadError) {
         throw new Error(`Thumbnail-Upload fehlgeschlagen: ${thumbnailUploadError.message || 'Unbekannter Storage-Fehler'}`);
