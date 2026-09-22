@@ -289,7 +289,9 @@
           upsert: true,
           contentType: pendingImageFile.type || undefined
         });
-      if (originalUploadError) throw originalUploadError;
+      if (originalUploadError) {
+        throw new Error(`Originalbild-Upload fehlgeschlagen: ${originalUploadError.message || 'Unbekannter Storage-Fehler'}`);
+      }
       uploadedPaths.push(originalPath);
 
       const { error: thumbnailUploadError } = await parentSupabase.storage
@@ -299,7 +301,9 @@
           upsert: true,
           contentType: 'image/webp'
         });
-      if (thumbnailUploadError) throw thumbnailUploadError;
+      if (thumbnailUploadError) {
+        throw new Error(`Thumbnail-Upload fehlgeschlagen: ${thumbnailUploadError.message || 'Unbekannter Storage-Fehler'}`);
+      }
       uploadedPaths.push(thumbnailPath);
 
       const originalUrl = parentSupabase.storage.from('whiskys').getPublicUrl(originalPath).data?.publicUrl || '';
@@ -325,6 +329,15 @@
     if (error) console.error('Bild-Upload konnte nicht vollständig bereinigt werden:', error);
   }
 
+  async function getResponseErrorMessage(response) {
+    try {
+      const payload = await response.json();
+      return payload?.message || payload?.error_description || payload?.error || `HTTP ${response.status}`;
+    } catch (_) {
+      return `HTTP ${response.status}`;
+    }
+  }
+
   async function patchImageUrls(whiskyId, imageUrl, thumbnailUrl, accessToken) {
     const res = await fetch(`${SUPABASE_URL}/rest/v1/gdb_whiskys?id=eq.${encodeURIComponent(whiskyId)}`, {
       method: 'PATCH',
@@ -340,7 +353,7 @@
     });
 
     if (!res.ok) {
-      throw new Error(`Bild-URLs speichern fehlgeschlagen (HTTP ${res.status})`);
+      throw new Error(`Bild-URLs speichern fehlgeschlagen: ${await getResponseErrorMessage(res)}`);
     }
   }
 
@@ -437,7 +450,7 @@
         },
         body: JSON.stringify(payload)
       });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      if (!res.ok) throw new Error(`Datensatz anlegen fehlgeschlagen: ${await getResponseErrorMessage(res)}`);
       const data = await res.json();
       const newId = data?.[0]?.id;
       if (!newId) throw new Error('Keine ID zurückgegeben');
