@@ -9,6 +9,73 @@
   min-width: 0;
 }
 
+.gin-filter-tools{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.gin-filter-menu{
+  position: relative;
+}
+
+.gin-filter-menu summary{
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 92px;
+  min-height: 34px;
+  height: 34px;
+  padding: 0 12px;
+  margin: 0;
+  color: var(--btn-text);
+  background: var(--btn-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+.gin-filter-menu summary::-webkit-details-marker{
+  display: none;
+}
+
+.gin-filter-menu summary::after{
+  content: "▾";
+  margin-left: 7px;
+}
+
+.gin-filter-menu[open] summary::after{
+  content: "▴";
+}
+
+.gin-filter-menu[data-active="true"] summary{
+  border-color: #b17828;
+  box-shadow: 0 0 0 1px rgba(177,120,40,0.35);
+}
+
+.gin-filter-menu-panel{
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  left: 0;
+  box-sizing: border-box;
+  min-width: 220px;
+  padding: 8px 12px;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+}
+
+.gin-filter-menu-panel label{
+  min-height: 32px;
+}
+
 .gin-toolbar input,
 .gin-toolbar select,
 .gin-toolbar button{
@@ -133,12 +200,16 @@ body.gin-view-active #ginFrame{
 
   .gin-toolbar .toolbar-block:last-child{
     display: grid !important;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .gin-toolbar .toolbar-block:last-child button{
     width: 100%;
     min-width: 0;
+    padding: 0 4px;
+    font-size: clamp(0.72rem, 3.2vw, 0.82rem);
+    white-space: nowrap;
   }
 
   body.gin-view-active{

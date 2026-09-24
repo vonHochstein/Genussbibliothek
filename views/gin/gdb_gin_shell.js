@@ -18,6 +18,13 @@
   const ginSearch = document.getElementById("ginSearch");
   const ginSort = document.getElementById("ginSort");
   const ginSortDir = document.getElementById("ginSortDir");
+  const ginFilterMenu = document.getElementById("ginFilterMenu");
+  const ginFilterSummary = document.getElementById("ginFilterSummary");
+  const ginFilterOwnStock = document.getElementById("ginFilterOwnStock");
+  const ginFilterCollector = document.getElementById("ginFilterCollector");
+  const ginFilterIncomplete = document.getElementById("ginFilterIncomplete");
+  const ginFilterWishlist = document.getElementById("ginFilterWishlist");
+  const ginFilterWithoutImage = document.getElementById("ginFilterWithoutImage");
   const ginCompareStock = document.getElementById("ginCompareStock");
   const btnGinList = document.getElementById("btnGinList");
   const btnNewGin = document.getElementById("btnNewGin");
@@ -84,6 +91,18 @@
     ginFrame?.contentWindow?.postMessage(message, "*");
   }
 
+  function updateFilterSummary() {
+    const activeCount = [
+      ginFilterOwnStock,
+      ginFilterCollector,
+      ginFilterIncomplete,
+      ginFilterWishlist,
+      ginFilterWithoutImage
+    ].filter((input) => !!input?.checked).length;
+    if (ginFilterSummary) ginFilterSummary.textContent = activeCount ? `Filter (${activeCount})` : "Filter";
+    if (ginFilterMenu) ginFilterMenu.dataset.active = activeCount ? "true" : "false";
+  }
+
   function syncToolbar() {
     postToGinFrame({ type: "gdb-gin-set-search", value: ginSearch?.value || "" });
     postToGinFrame({
@@ -91,6 +110,16 @@
       value: {
         mode: ginSort?.value || "updated",
         dir: ginSortDir?.dataset.dir || "desc"
+      }
+    });
+    postToGinFrame({
+      type: "gdb-gin-set-filters",
+      value: {
+        ownStock: !!ginFilterOwnStock?.checked,
+        collector: !!ginFilterCollector?.checked,
+        incomplete: !!ginFilterIncomplete?.checked,
+        wishlist: !!ginFilterWishlist?.checked,
+        withoutImage: !!ginFilterWithoutImage?.checked
       }
     });
     postToGinFrame({
@@ -110,6 +139,13 @@
       ginSortDir.textContent = "↓";
       ginSortDir.setAttribute("aria-label", "Sortierreihenfolge absteigend");
     }
+    if (ginFilterOwnStock) ginFilterOwnStock.checked = false;
+    if (ginFilterCollector) ginFilterCollector.checked = false;
+    if (ginFilterIncomplete) ginFilterIncomplete.checked = false;
+    if (ginFilterWishlist) ginFilterWishlist.checked = false;
+    if (ginFilterWithoutImage) ginFilterWithoutImage.checked = false;
+    if (ginFilterMenu) ginFilterMenu.open = false;
+    updateFilterSummary();
     if (ginCompareStock) ginCompareStock.checked = false;
     if (ginCount) ginCount.textContent = "0 Gins";
     selectedCompareUserId = null;
@@ -307,6 +343,26 @@
   });
 
   ginSort?.addEventListener("change", syncToolbar);
+  ginFilterOwnStock?.addEventListener("change", () => {
+    updateFilterSummary();
+    syncToolbar();
+  });
+  ginFilterCollector?.addEventListener("change", () => {
+    updateFilterSummary();
+    syncToolbar();
+  });
+  ginFilterIncomplete?.addEventListener("change", () => {
+    updateFilterSummary();
+    syncToolbar();
+  });
+  ginFilterWishlist?.addEventListener("change", () => {
+    updateFilterSummary();
+    syncToolbar();
+  });
+  ginFilterWithoutImage?.addEventListener("change", () => {
+    updateFilterSummary();
+    syncToolbar();
+  });
   ginSortDir?.addEventListener("click", () => {
     const next = ginSortDir.dataset.dir === "desc" ? "asc" : "desc";
     ginSortDir.dataset.dir = next;
@@ -367,7 +423,16 @@
   });
 
   document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape") closeAllModals();
+    if (event.key === "Escape") {
+      closeAllModals();
+      if (ginFilterMenu) ginFilterMenu.open = false;
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (ginFilterMenu?.open && !ginFilterMenu.contains(event.target)) {
+      ginFilterMenu.open = false;
+    }
   });
 
   window.addEventListener("message", (event) => {

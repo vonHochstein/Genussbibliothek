@@ -84,6 +84,11 @@
     let CURRENT_SEARCH_TERM = "";
     let CURRENT_SORT_MODE = "name";
     let CURRENT_SORT_DIRECTION = "asc";
+    let CURRENT_FILTER_OWN_STOCK = false;
+    let CURRENT_FILTER_COLLECTOR = false;
+    let CURRENT_FILTER_INCOMPLETE = false;
+    let CURRENT_FILTER_WISHLIST = false;
+    let CURRENT_FILTER_WITHOUT_IMAGE = false;
     let CURRENT_COMPARE_STOCK = false;
     let CURRENT_COMPARE_USER_ID = null;
 
@@ -185,6 +190,26 @@
 
           return terms.every(term => haystack.includes(term));
         });
+      }
+
+      if (CURRENT_FILTER_OWN_STOCK) {
+        result = result.filter((w) => Number(MY_STOCK_BY_ID.get(w.id) ?? 0) > 0);
+      }
+
+      if (CURRENT_FILTER_COLLECTOR) {
+        result = result.filter((w) => !!w.collector);
+      }
+
+      if (CURRENT_FILTER_INCOMPLETE) {
+        result = result.filter((w) => !!w.provisional);
+      }
+
+      if (CURRENT_FILTER_WISHLIST) {
+        result = result.filter((w) => !!MY_WISHLIST_BY_ID.get(w.id));
+      }
+
+      if (CURRENT_FILTER_WITHOUT_IMAGE) {
+        result = result.filter((w) => !(w.image_url || "").trim());
       }
 
       if (CURRENT_COMPARE_STOCK && CURRENT_COMPARE_USER_ID) {
@@ -896,6 +921,15 @@ async function boot(){
       if (e.data.type === "gdb-gin-set-sort") {
         CURRENT_SORT_MODE = (e.data.value?.mode || "name").toString();
         CURRENT_SORT_DIRECTION = (e.data.value?.dir || "asc").toString();
+        rerenderCurrentList();
+      }
+
+      if (e.data.type === "gdb-gin-set-filters") {
+        CURRENT_FILTER_OWN_STOCK = !!e.data.value?.ownStock;
+        CURRENT_FILTER_COLLECTOR = !!e.data.value?.collector;
+        CURRENT_FILTER_INCOMPLETE = !!e.data.value?.incomplete;
+        CURRENT_FILTER_WISHLIST = !!e.data.value?.wishlist;
+        CURRENT_FILTER_WITHOUT_IMAGE = !!e.data.value?.withoutImage;
         rerenderCurrentList();
       }
 

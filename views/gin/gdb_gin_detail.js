@@ -262,6 +262,9 @@ function fmtDE(iso) {
     "Nordirland": "Flag_of_the_United_Kingdom.svg",
     "Irland": "Flag_of_Ireland.svg",
     "Frankreich": "Flag_of_France.svg",
+    "Niederlande": "Flag_of_the_Netherlands.svg",
+    "Belgien": "Flag_of_Belgium.svg",
+    "Spanien": "Flag_of_Spain.svg",
     "USA": "Flag_of_the_United_States.svg",
     "Japan": "Flag_of_Japan.svg",
     "Australien": "Flag_of_Australia.svg",
@@ -1879,6 +1882,10 @@ document.addEventListener("keydown", (e) => {
 
   if (btnEditMyDetails) {
     btnEditMyDetails.addEventListener("click", async () => {
+      if (!requireUpdatePermission()) {
+        return;
+      }
+
       if (!isMyDetailsEditMode) {
         originalMyNotes = notesEl && notesEl.textContent && notesEl.textContent !== "–"
           ? notesEl.textContent
