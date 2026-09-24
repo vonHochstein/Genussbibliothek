@@ -271,6 +271,9 @@ function fmtDE(iso) {
     "Nordirland": "Flag_of_the_United_Kingdom.svg",
     "Irland": "Flag_of_Ireland.svg",
     "Frankreich": "Flag_of_France.svg",
+    "Niederlande": "Flag_of_the_Netherlands.svg",
+    "Belgien": "Flag_of_Belgium.svg",
+    "Spanien": "Flag_of_Spain.svg",
     "USA": "Flag_of_the_United_States.svg",
     "Japan": "Flag_of_Japan.svg",
     "Australien": "Flag_of_Australia.svg",
@@ -583,6 +586,18 @@ function fmtDE(iso) {
 
   function requireDeletePermission() {
     return window.parent?.GdbPermissions?.requirePermission?.('whisky', 'delete') ?? true;
+  }
+
+  async function getAccessToken() {
+    const parentSupabase = window.parent?.supabaseClient || window.supabaseClient || null;
+    if (!parentSupabase?.auth?.getSession) {
+      throw new Error("Supabase-Session ist nicht verfügbar");
+    }
+    const { data, error } = await parentSupabase.auth.getSession();
+    if (error) throw error;
+    const accessToken = data?.session?.access_token;
+    if (!accessToken) throw new Error("Keine gültige Supabase-Session");
+    return accessToken;
   }
 
   async function getResponseErrorMessage(response) {
@@ -1974,6 +1989,10 @@ document.addEventListener("keydown", (e) => {
 
   if (btnEditMyDetails) {
     btnEditMyDetails.addEventListener("click", async () => {
+      if (!requireUpdatePermission()) {
+        return;
+      }
+
       if (!isMyDetailsEditMode) {
         originalMyNotes = notesEl && notesEl.textContent && notesEl.textContent !== "–"
           ? notesEl.textContent
@@ -2424,6 +2443,7 @@ document.addEventListener("keydown", (e) => {
 
   async function loadWhiskyName() {
     try {
+      const accessToken = await getAccessToken();
       const url =
         `${SUPABASE_URL}/rest/v1/gdb_whiskys` +
         `?id=eq.${encodeURIComponent(id)}` +
@@ -2431,7 +2451,7 @@ document.addEventListener("keydown", (e) => {
       const res = await fetch(url, {
         headers: {
           apikey: SUPABASE_ANON_KEY,
-          Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+          Authorization: `Bearer ${accessToken}`,
         },
       });
 

@@ -105,6 +105,30 @@ const WORLD_MAP_CONFIG = {
     statusLabel: "Schweiz",
     entryCountries: ["Schweiz"]
   },
+  "Frankreich": {
+    selectors: ["#fr", "g#fr", "[id='fr']", "[class~='fr']", "[name='fr']", "[inkscape\\:label='fr']", "[title='France']", "[aria-label='France']"],
+    focusViewBox: "410 155 130 110",
+    statusLabel: "Frankreich",
+    entryCountries: ["Frankreich"]
+  },
+  "Niederlande": {
+    selectors: ["#nl", "g#nl", "[id='nl']", "[class~='nl']", "[name='nl']", "[inkscape\\:label='nl']", "[title='Netherlands']", "[aria-label='Netherlands']"],
+    focusViewBox: "420 130 110 90",
+    statusLabel: "Niederlande",
+    entryCountries: ["Niederlande"]
+  },
+  "Belgien": {
+    selectors: ["#be", "g#be", "[id='be']", "[class~='be']", "[name='be']", "[inkscape\\:label='be']", "[title='Belgium']", "[aria-label='Belgium']"],
+    focusViewBox: "415 145 110 85",
+    statusLabel: "Belgien",
+    entryCountries: ["Belgien"]
+  },
+  "Spanien": {
+    selectors: ["#es", "g#es", "[id='es']", "[class~='es']", "[name='es']", "[inkscape\\:label='es']", "[title='Spain']", "[aria-label='Spain']"],
+    focusViewBox: "365 190 160 120",
+    statusLabel: "Spanien",
+    entryCountries: ["Spanien"]
+  },
   "Kanada": {
     selectors: ["#ca", "g#ca", "[id='ca']", "[class~='ca']", "[name='ca']", "[inkscape\\:label='ca']", "[title='Canada']", "[aria-label='Canada']"],
     focusViewBox: "80 55 320 160",
