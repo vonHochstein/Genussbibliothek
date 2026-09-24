@@ -18,6 +18,7 @@
     "Schottland": "Flag_of_the_United_Kingdom.svg",
     "Nordirland": "Flag_of_the_United_Kingdom.svg",
     "Irland": "Flag_of_Ireland.svg",
+    "Frankreich": "Flag_of_France.svg",
     "USA": "Flag_of_the_United_States.svg",
     "Japan": "Flag_of_Japan.svg",
     "Australien": "Flag_of_Australia.svg",
