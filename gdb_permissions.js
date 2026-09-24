@@ -41,6 +41,7 @@
   function toReadableScope(scope) {
     const key = normalize(scope);
     if (key === "whisky") return "Whisky";
+    if (key === "gin") return "Gin";
     if (key === "wine") return "Wein";
     if (key === "cigar") return "Zigarren";
     if (key === "system") return "System";
@@ -119,7 +120,7 @@
 
 function getAllKnownPermissionsForScope(scope) {
 const normalizedScope = normalize(scope);
-if (normalizedScope === "whisky") {
+if (normalizedScope === "whisky" || normalizedScope === "gin") {
     return ["read", "create", "update", "delete"];
 }
 return uniqueSorted(getPermissionsForScope(scope));

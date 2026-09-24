@@ -13,6 +13,7 @@
 <link rel="stylesheet" href="gdb_stars.css">
 <link rel="stylesheet" href="gdb_stockbar.css">
 <link rel="stylesheet" href="gdb_pli.css">
+<link rel="stylesheet" href="views/gin/gdb_gin_shell.css">
 
 
 <div class="topbar app-topbar" style="display:none;">
@@ -105,10 +106,10 @@
       <div class="hint" id="tileStatWhisky">Lade Daten…</div>
     </div>
 
-    <div class="card tile" title="Kommt als Nächstes">
-      <img src="icons/gin_384.png" alt="">
+    <div id="tileGin" class="card tile" title="Gin-Übersicht & Detailansichten">
+      <img src="icons/gin_384.png" alt="Gin">
       <h3>Gin</h3>
-      <div class="hint">folgt...</div>
+      <div class="hint" id="tileStatGin">Lade Daten…</div>
     </div>
 
     <div class="card tile" title="Kommt als Nächstes">
@@ -155,6 +156,52 @@
 
   </div>
 
+</div>
+
+<!-- Gin (Kartenansicht, bis zur vollständigen Abnahme nicht öffentlich aktiviert) -->
+<div id="ginListView" class="view hidden">
+  <div class="card">
+    <div class="view-header">
+      <h3 id="ginViewTitle">Gin</h3>
+      <button id="backToDashFromGinBtn" class="btn" type="button">Zurück</button>
+    </div>
+    <p id="ginLoginOk" class="ok" style="margin-top:0; margin-bottom:10px"></p>
+
+    <div class="gin-toolbar card" style="margin-top:1px; padding:10px;">
+      <div class="toolbar-block">
+        <div id="ginCount" class="muted">0 Gins</div>
+      </div>
+      <div class="toolbar-block">
+        <input id="ginSearch" type="text" placeholder="Gin suchen…" autocomplete="off" style="width:100%;">
+      </div>
+      <div class="toolbar-block" style="display:flex; gap:8px; align-items:center;">
+        <select id="ginSort" style="width:100%;">
+          <option value="name">Name</option>
+          <option value="rating_avg">Bewertung (Ø)</option>
+          <option value="rating_user">Meine Bewertung</option>
+          <option value="pli_avg">PLI (Ø)</option>
+          <option value="pli_user">Mein PLI</option>
+          <option value="price">Preis</option>
+          <option value="created">erstellt</option>
+          <option value="updated">geändert</option>
+        </select>
+        <button id="ginSortDir" class="btn" type="button" title="Sortierreihenfolge umschalten" aria-label="Sortierreihenfolge absteigend">↓</button>
+      </div>
+      <div class="toolbar-block">
+        <label style="display:flex; align-items:center; gap:6px;">
+          <input type="checkbox" id="ginCompareStock">
+          <span>Bestandsvergleich</span>
+        </label>
+      </div>
+      <div class="toolbar-block" style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button id="btnGinList" class="btn" type="button">Filter Reset</button>
+        <button id="btnNewGin" class="btn" type="button">Neuer Gin</button>
+      </div>
+    </div>
+  </div>
+
+  <p id="ginMsg" class="" style="margin-top:0; margin-bottom:0"></p>
+  <iframe id="ginFrame" class="view-frame" src="" loading="lazy"></iframe>
 </div>
 
 <!-- Whisky (Kartenansicht) -->
@@ -334,9 +381,72 @@
   </div>
 </div>
 
+<!-- Gin PLI Modal -->
+<div id="ginPliModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-gin-modal="ginPliModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="ginPliModalTitle">
+    <div class="modal-header">
+      <h3 id="ginPliModalTitle">Preis-Leistungs-Index (PLI)</h3>
+      <button id="ginPliCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div class="modal-body">
+      <p>Der PLI setzt die persönliche Bewertung und den Preis pro Liter ins Verhältnis. Je höher der Wert, desto mehr bewerteter Genuss entfällt rechnerisch auf den eingesetzten Euro.</p>
+      <p><strong>Formel:</strong> Bewertung ÷ Preis pro Liter</p>
+      <ul class="pli-scale-list">
+        <li><strong>&lt; 0,04</strong> – eher schwaches Preis-Leistungs-Verhältnis</li>
+        <li><strong>0,04–0,07</strong> – eher teuer</li>
+        <li><strong>0,08–0,11</strong> – fair bepreist</li>
+        <li><strong>0,12–0,16</strong> – gutes Preis-Leistungs-Verhältnis</li>
+        <li><strong>&gt; 0,16</strong> – sehr gutes Preis-Leistungs-Verhältnis</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Gin Bewertungen Modal -->
+<div id="ginRatingsModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-gin-modal="ginRatingsModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="ginRatingsModalTitle">
+    <div class="modal-header">
+      <h3 id="ginRatingsModalTitle">Alle Bewertungen</h3>
+      <button id="ginRatingsCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div id="ginRatingsModalContent" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- Gin Bestände Modal -->
+<div id="ginStocksModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-gin-modal="ginStocksModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="ginStocksTitle">
+    <div class="modal-header">
+      <h3 id="ginStocksTitle">Bestände</h3>
+      <button id="ginStocksCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div id="ginStocksBody" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- Gin Bestandsvergleich Modal -->
+<div id="ginCompareStockModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-gin-modal="ginCompareStockModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="ginCompareStockTitle">
+    <div class="modal-header"><h3 id="ginCompareStockTitle">Bestandsvergleich</h3></div>
+    <div class="modal-body">
+      <p class="muted" style="margin-top:0;">Mit welchem Nutzer soll dein Bestand verglichen werden?</p>
+      <div id="ginCompareStockUserList" class="compare-stock-user-list"></div>
+      <div class="row" style="justify-content:flex-end; margin-top:12px;">
+        <button id="ginCompareStockCancelBtn" class="btn modal-close" type="button">Abbrechen</button>
+        <button id="ginCompareStockApplyBtn" class="btn modal-close" type="button">Anwenden</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="gdb_theme.js"></script>
 <script src="gdb_news.js"></script>
 <script src="gdb_permissions.js"></script>
 <script src="gdb_index.js"></script>
+<script src="views/gin/gdb_gin_shell.js"></script>
 </html>
