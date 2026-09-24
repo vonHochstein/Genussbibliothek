@@ -187,7 +187,32 @@
         </select>
         <button id="ginSortDir" class="btn" type="button" title="Sortierreihenfolge umschalten" aria-label="Sortierreihenfolge absteigend">↓</button>
       </div>
-      <div class="toolbar-block">
+      <div class="toolbar-block gin-filter-tools">
+        <details id="ginFilterMenu" class="gin-filter-menu">
+          <summary id="ginFilterSummary">Filter</summary>
+          <div class="gin-filter-menu-panel">
+            <label>
+              <input type="checkbox" id="ginFilterOwnStock">
+              <span>Nur eigener Bestand</span>
+            </label>
+            <label>
+              <input type="checkbox" id="ginFilterCollector">
+              <span>Nur Sammlerflaschen</span>
+            </label>
+            <label>
+              <input type="checkbox" id="ginFilterIncomplete">
+              <span>Nur unvollständige Einträge</span>
+            </label>
+            <label>
+              <input type="checkbox" id="ginFilterWishlist">
+              <span>Nur Wunschliste</span>
+            </label>
+            <label>
+              <input type="checkbox" id="ginFilterWithoutImage">
+              <span>Nur Einträge ohne Bild</span>
+            </label>
+          </div>
+        </details>
         <label style="display:flex; align-items:center; gap:6px;">
           <input type="checkbox" id="ginCompareStock">
           <span>Bestandsvergleich</span>
@@ -242,8 +267,33 @@
         <button id="whiskySortDir" class="btn" type="button" title="Sortierreihenfolge umschalten" aria-label="Sortierreihenfolge aufsteigend">↑</button>
       </div>
 
-      <!-- Bestand Vergleich -->
-      <div class="toolbar-block">
+      <!-- Filter und Bestand Vergleich -->
+      <div class="toolbar-block whisky-filter-tools">
+        <details id="whiskyFilterMenu" class="whisky-filter-menu">
+          <summary id="whiskyFilterSummary">Filter</summary>
+          <div class="whisky-filter-menu-panel">
+            <label>
+              <input type="checkbox" id="whiskyFilterOwnStock">
+              <span>Nur eigener Bestand</span>
+            </label>
+            <label>
+              <input type="checkbox" id="whiskyFilterCollector">
+              <span>Nur Sammlerflaschen</span>
+            </label>
+            <label>
+              <input type="checkbox" id="whiskyFilterIncomplete">
+              <span>Nur unvollständige Einträge</span>
+            </label>
+            <label>
+              <input type="checkbox" id="whiskyFilterWishlist">
+              <span>Nur Wunschliste</span>
+            </label>
+            <label>
+              <input type="checkbox" id="whiskyFilterWithoutImage">
+              <span>Nur Einträge ohne Bild</span>
+            </label>
+          </div>
+        </details>
         <label style="display:flex; align-items:center; gap:6px;">
           <input type="checkbox" id="whiskyCompareStock">
           <span>Bestandsvergleich</span>
@@ -447,6 +497,6 @@
 <script src="gdb_theme.js"></script>
 <script src="gdb_news.js"></script>
 <script src="gdb_permissions.js"></script>
-<script src="gdb_index.js"></script>
+<script src="gdb_index.js?v=20260924-1"></script>
 <script src="views/gin/gdb_gin_shell.js"></script>
 </html>

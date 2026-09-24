@@ -73,6 +73,13 @@ const whiskyCountEl = document.getElementById("whiskyCount");
 const whiskySearchEl = document.getElementById("whiskySearch");
 const whiskySortEl = document.getElementById("whiskySort");
 const whiskySortDirEl = document.getElementById("whiskySortDir");
+const whiskyFilterMenuEl = document.getElementById("whiskyFilterMenu");
+const whiskyFilterSummaryEl = document.getElementById("whiskyFilterSummary");
+const whiskyFilterOwnStockEl = document.getElementById("whiskyFilterOwnStock");
+const whiskyFilterCollectorEl = document.getElementById("whiskyFilterCollector");
+const whiskyFilterIncompleteEl = document.getElementById("whiskyFilterIncomplete");
+const whiskyFilterWishlistEl = document.getElementById("whiskyFilterWishlist");
+const whiskyFilterWithoutImageEl = document.getElementById("whiskyFilterWithoutImage");
 const whiskyCompareStockEl = document.getElementById("whiskyCompareStock");
 const btnListEl = document.getElementById("btnList");
 const btnNewWhiskyEl = document.getElementById("btnNewWhisky");
@@ -105,6 +112,23 @@ function postToWhiskyFrame(message) {
   whiskyFrame.contentWindow.postMessage(message, "*");
 }
 
+function updateWhiskyFilterSummary() {
+  const activeCount = [
+    whiskyFilterOwnStockEl,
+    whiskyFilterCollectorEl,
+    whiskyFilterIncompleteEl,
+    whiskyFilterWishlistEl,
+    whiskyFilterWithoutImageEl
+  ].filter((input) => !!input?.checked).length;
+
+  if (whiskyFilterSummaryEl) {
+    whiskyFilterSummaryEl.textContent = activeCount ? `Filter (${activeCount})` : "Filter";
+  }
+  if (whiskyFilterMenuEl) {
+    whiskyFilterMenuEl.dataset.active = activeCount ? "true" : "false";
+  }
+}
+
 function syncWhiskyToolbarToFrame() {
   postToWhiskyFrame({
     type: "gdb-set-search",
@@ -116,6 +140,17 @@ function syncWhiskyToolbarToFrame() {
     value: {
       mode: whiskySortEl?.value || "name",
       dir: whiskySortDirEl?.dataset.dir || "asc"
+    }
+  });
+
+  postToWhiskyFrame({
+    type: "gdb-set-filters",
+    value: {
+      ownStock: !!whiskyFilterOwnStockEl?.checked,
+      collector: !!whiskyFilterCollectorEl?.checked,
+      incomplete: !!whiskyFilterIncompleteEl?.checked,
+      wishlist: !!whiskyFilterWishlistEl?.checked,
+      withoutImage: !!whiskyFilterWithoutImageEl?.checked
     }
   });
 
@@ -137,6 +172,13 @@ function resetWhiskyToolbarState() {
     whiskySortDirEl.setAttribute("aria-label", "Sortierreihenfolge absteigend");
     whiskySortDirEl.title = "Sortierreihenfolge umschalten";
   }
+  if (whiskyFilterOwnStockEl) whiskyFilterOwnStockEl.checked = false;
+  if (whiskyFilterCollectorEl) whiskyFilterCollectorEl.checked = false;
+  if (whiskyFilterIncompleteEl) whiskyFilterIncompleteEl.checked = false;
+  if (whiskyFilterWishlistEl) whiskyFilterWishlistEl.checked = false;
+  if (whiskyFilterWithoutImageEl) whiskyFilterWithoutImageEl.checked = false;
+  if (whiskyFilterMenuEl) whiskyFilterMenuEl.open = false;
+  updateWhiskyFilterSummary();
   if (whiskyCompareStockEl) whiskyCompareStockEl.checked = false;
   if (whiskyCountEl) whiskyCountEl.textContent = "0 Whiskys";
   selectedCompareUserId = null;
@@ -916,6 +958,19 @@ function sendSortToFrame() {
 }
 
 whiskySortEl?.addEventListener("change", sendSortToFrame);
+[
+  whiskyFilterOwnStockEl,
+  whiskyFilterCollectorEl,
+  whiskyFilterIncompleteEl,
+  whiskyFilterWishlistEl,
+  whiskyFilterWithoutImageEl
+].forEach((input) => {
+  input?.addEventListener("change", () => {
+    updateWhiskyFilterSummary();
+    syncWhiskyToolbarToFrame();
+  });
+});
+
 whiskySortDirEl?.addEventListener("click", () => {
   const nextDir = whiskySortDirEl.dataset.dir === "desc" ? "asc" : "desc";
   whiskySortDirEl.dataset.dir = nextDir;
@@ -1049,6 +1104,10 @@ compareStockUserList?.addEventListener("change", (e) => {
 
   // Klick auf Backdrop schließt
   document.addEventListener("click", (e) => {
+    if (whiskyFilterMenuEl?.open && !whiskyFilterMenuEl.contains(e.target)) {
+      whiskyFilterMenuEl.open = false;
+    }
+
     const el = e.target?.closest?.("[data-close-modal]");
     const id = el?.getAttribute?.("data-close-modal");
     if (!id) return;
@@ -1064,6 +1123,7 @@ compareStockUserList?.addEventListener("change", (e) => {
   // ESC schließt (wenn offen)
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
+    if (whiskyFilterMenuEl) whiskyFilterMenuEl.open = false;
     if (pliModal && !pliModal.classList.contains("hidden")) closeModal(pliModal);
     if (ratingsModal && !ratingsModal.classList.contains("hidden")) closeModal(ratingsModal);
     if (stocksModal && !stocksModal.classList.contains("hidden")) closeModal(stocksModal);
@@ -1127,7 +1187,7 @@ compareStockUserList?.addEventListener("change", (e) => {
         `&t_finish=${encodeURIComponent(data.myFinish ?? "")}`+
         `&t_summary=${encodeURIComponent(data.mySummary ?? "")}`+
         `&t_trinkgelegenheit=${encodeURIComponent(data.myTrinkgelegenheit ?? "")}`+
-        `&wishlist=${encodeURIComponent(data.myWishlist ?? "")}` +
+        `&myWishlist=${encodeURIComponent(data.myWishlist ?? "")}` +
         `&created_at=${encodeURIComponent(data.created_at ?? "")}`+
         `&updated_at=${encodeURIComponent(data.updated_at ?? "")}`+
         `&created_by=${encodeURIComponent(data.created_by ?? "")}`+

@@ -481,6 +481,73 @@ body.dark .prelogin-login-card{
   min-width: 0;
 }
 
+.whisky-filter-tools{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.whisky-filter-menu{
+  position: relative;
+}
+
+.whisky-filter-menu summary{
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 92px;
+  min-height: 34px;
+  height: 34px;
+  padding: 0 12px;
+  margin: 0;
+  color: var(--btn-text);
+  background: var(--btn-bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+.whisky-filter-menu summary::-webkit-details-marker{
+  display: none;
+}
+
+.whisky-filter-menu summary::after{
+  content: "▾";
+  margin-left: 7px;
+}
+
+.whisky-filter-menu[open] summary::after{
+  content: "▴";
+}
+
+.whisky-filter-menu[data-active="true"] summary{
+  border-color: #b17828;
+  box-shadow: 0 0 0 1px rgba(177,120,40,0.35);
+}
+
+.whisky-filter-menu-panel{
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 6px);
+  left: 0;
+  box-sizing: border-box;
+  min-width: 220px;
+  padding: 8px 12px;
+  color: var(--text);
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.22);
+}
+
+.whisky-filter-menu-panel label{
+  min-height: 32px;
+}
+
 .whisky-toolbar input,
 .whisky-toolbar select,
 .whisky-toolbar button{
@@ -557,12 +624,16 @@ body.dark .prelogin-login-card{
 
   .whisky-toolbar .toolbar-block:last-child{
     display: grid !important;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .whisky-toolbar .toolbar-block:last-child button{
     width: 100%;
     min-width: 0;
+    padding: 0 4px;
+    font-size: clamp(0.72rem, 3.2vw, 0.82rem);
+    white-space: nowrap;
   }
 }
 
