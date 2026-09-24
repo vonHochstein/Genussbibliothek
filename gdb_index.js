@@ -562,7 +562,9 @@ function buildWhiskySub(w) {
   const parts = [];
   if (w.country) parts.push(w.country);
   if (w.region) parts.push(w.region);
-  if (w.age_years != null) parts.push(`${w.age_years} Jahre`);
+  if (w.age_years != null) {
+    parts.push(`${w.age_years} ${Number(w.age_years) === 1 ? "Jahr" : "Jahre"}`);
+  }
   if (w.distillery) parts.push(w.distillery);
   return parts.join(" · ");
 }
@@ -674,7 +676,10 @@ async function loadWhiskyTileStats() {
         .filter(Boolean)
     );
 
-    el.textContent = `${count} Whiskys aus ${countries.size} Ländern`;
+    const whiskyCount = Number(count) || 0;
+    const whiskyText = whiskyCount === 1 ? "1 Whisky" : `${whiskyCount} Whiskys`;
+    const countryText = countries.size === 1 ? "einem Land" : `${countries.size} Ländern`;
+    el.textContent = `${whiskyText} aus ${countryText}`;
   } catch (e) {
     console.error("Whisky-Stats Fehler:", e);
     el.textContent = "Stats nicht verfügbar";
