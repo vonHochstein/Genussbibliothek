@@ -395,12 +395,12 @@ function renderStats(stats) {
   statsGridEl.innerHTML = `
     <div class="dashboard-stat card">
       <div class="dashboard-stat-value">${stats.totalWhiskys}</div>
-      <div class="dashboard-stat-label">Whiskys gesamt</div>
+      <div class="dashboard-stat-label">${stats.totalWhiskys === 1 ? "Whisky gesamt" : "Whiskys gesamt"}</div>
     </div>
 
     <div class="dashboard-stat card">
       <div class="dashboard-stat-value">${stats.totalCountries}</div>
-      <div class="dashboard-stat-label">Länder</div>
+      <div class="dashboard-stat-label">${stats.totalCountries === 1 ? "Land" : "Länder"}</div>
     </div>
 
     <div class="dashboard-stat card">

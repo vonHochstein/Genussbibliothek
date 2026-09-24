@@ -347,8 +347,11 @@ function renderList(list){
       ? ("(" + Number(w.price_per_liter_eur).toFixed(2) + " €/L)")
       : "";
 
+    const ageText = w.age_years
+      ? ` • ${w.age_years} ${Number(w.age_years) === 1 ? "Jahr" : "Jahre"}`
+      : "";
     const countryRegion =
-      `${w.country || ""}${w.region ? " – " + w.region : ""}${w.age_years ? " • " + w.age_years + " Jahre" : ""}`;
+      `${w.country || ""}${w.region ? " – " + w.region : ""}${ageText}`;
 
     const flagHtml = `
       ${w.flag_url ? `<img src="${w.flag_url}" alt="${escapeHtml(w.country||"")}" style="height:1em;vertical-align:middle;margin-right:3px;">` : ""}

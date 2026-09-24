@@ -487,7 +487,7 @@ function fmtDE(iso) {
     if (ageEl) {
       ageEl.textContent = savedIsNas
         ? "NAS"
-        : (hasAge ? `${savedAgeYears} Jahre` : "");
+        : (hasAge ? `${savedAgeYears} ${Number(savedAgeYears) === 1 ? "Jahr" : "Jahre"}` : "");
       ageEl.style.display = hasAge ? "inline" : "none";
     }
 
@@ -527,7 +527,7 @@ function fmtDE(iso) {
 
     if (outturnLineEl && outturnEl) {
       if (savedBottleOutturn != null && !Number.isNaN(savedBottleOutturn)) {
-        outturnEl.textContent = `${savedBottleOutturn} Flaschen`;
+        outturnEl.textContent = `${savedBottleOutturn} ${Number(savedBottleOutturn) === 1 ? "Flasche" : "Flaschen"}`;
         outturnLineEl.style.display = "";
       } else {
         outturnLineEl.style.display = "none";
@@ -774,8 +774,14 @@ function closeDeleteWhiskyModal() {
     if (type === "price") return `${formatEuro(value)} €`;
     if (type === "abv") return `${Number(value)} % vol`;
     if (type === "volume") return `${Number(value)} ml`;
-    if (type === "outturn") return `${Number(value)} Flaschen`;
-    if (type === "age") return Number(value) === 0 ? "NAS" : `${Number(value)} Jahre`;
+    if (type === "outturn") {
+      const count = Number(value);
+      return `${count} ${count === 1 ? "Flasche" : "Flaschen"}`;
+    }
+    if (type === "age") {
+      const years = Number(value);
+      return years === 0 ? "NAS" : `${years} ${years === 1 ? "Jahr" : "Jahre"}`;
+    }
 
     return String(value);
   }
