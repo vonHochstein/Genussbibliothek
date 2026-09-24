@@ -506,7 +506,7 @@ function fmtDE(iso) {
 
     if (outturnLineEl && outturnEl) {
       if (savedBottleOutturn != null && !Number.isNaN(savedBottleOutturn)) {
-        outturnEl.textContent = `${savedBottleOutturn} Flaschen`;
+        outturnEl.textContent = `${savedBottleOutturn} ${Number(savedBottleOutturn) === 1 ? "Flasche" : "Flaschen"}`;
         outturnLineEl.style.display = "";
       } else {
         outturnLineEl.style.display = "none";
@@ -731,7 +731,10 @@ function closeDeleteGinModal() {
     if (type === "price") return `${formatEuro(value)} €`;
     if (type === "abv") return `${Number(value)} % vol`;
     if (type === "volume") return `${Number(value)} ml`;
-    if (type === "outturn") return `${Number(value)} Flaschen`;
+    if (type === "outturn") {
+      const count = Number(value);
+      return `${count} ${count === 1 ? "Flasche" : "Flaschen"}`;
+    }
     return String(value);
   }
 

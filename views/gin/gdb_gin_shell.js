@@ -147,7 +147,10 @@
       const { data, error } = await window.supabaseClient.from("gdb_gins").select("country");
       if (error) throw error;
       const countries = new Set((data || []).map((row) => (row.country || "").trim()).filter(Boolean));
-      tileStatGin.textContent = `${count || 0} Gins aus ${countries.size} Ländern`;
+      const ginCountValue = Number(count) || 0;
+      const ginText = ginCountValue === 1 ? "1 Gin" : `${ginCountValue} Gins`;
+      const countryText = countries.size === 1 ? "einem Land" : `${countries.size} Ländern`;
+      tileStatGin.textContent = `${ginText} aus ${countryText}`;
     } catch (error) {
       console.error("Gin-Stats konnten nicht geladen werden:", error);
       tileStatGin.textContent = "Stats nicht verfügbar";
