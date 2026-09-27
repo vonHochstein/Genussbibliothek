@@ -57,21 +57,27 @@
     "Campbeltown": "Flag_of_Scotland.svg",
     "Leinster": "Flag_of_Leinster.svg",
     "Cork/ Munster": "Flag_of_Munster.svg",
+    "County Kerry": "Flag_of_county_Kerry.svg",
     "Antrim": "Flag_of_Northern_Ireland.svg",
+    "County Down": "Flag_of_county_Down.svg",
     "Victoria/ Melbourne": "Flag_of_Victoria_(Australia).svg",
     "Kentucky": "Flag_of_Kentucky.svg",
     "Indiana": "Flag_of_Indiana.svg",
-    "Manitoba": "Flag_of_Canada_(Pantone).svg"
+    "Pennsylvania": "Flag_of_Pennsylvania.svg",
+    "Washington": "Flag_of_Washington.svg",
+    "Manitoba": "Flag_of_Canada_(Pantone).svg",
+    "Luzern": "Flag_of_Canton_of_Lucerne.svg"
   };
 
   const REGION_BY_COUNTRY = {
     "Deutschland": ["Baden-Württemberg", "Bayern", "Berlin", "Brandenburg", "Bremen", "Hamburg", "Hessen", "Mecklenburg-Vorpommern", "Niedersachsen", "Nordrhein-Westfalen", "Rheinland-Pfalz", "Saarland", "Sachsen", "Sachsen-Anhalt", "Schleswig-Holstein", "Thüringen"],
     "Schottland": ["Highlands", "Speyside", "Lowlands", "Islay", "Islands", "Campbeltown"],
-    "Irland": ["Leinster", "Cork/ Munster"],
-    "Nordirland": ["Antrim"],
-    "USA": ["Kentucky", "Indiana"],
+    "Irland": ["Leinster", "Cork/ Munster", "County Kerry"],
+    "Nordirland": ["Antrim", "County Down"],
+    "USA": ["Kentucky", "Indiana", "Pennsylvania", "Washington"],
     "Australien": ["Victoria/ Melbourne"],
-    "Kanada": ["Manitoba"]
+    "Kanada": ["Manitoba"],
+    "Schweiz": ["Luzern"]
   };
 
   const originalRegionOptions = Array.from(document.getElementById('editRegion')?.options || []).map(opt => ({value: opt.value, text: opt.textContent || ''}));
