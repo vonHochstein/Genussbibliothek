@@ -68,7 +68,8 @@
     "Pennsylvania": "Flag_of_Pennsylvania.svg",
     "Washington": "Flag_of_Washington.svg",
     "Manitoba": "Flag_of_Canada_(Pantone).svg",
-    "Luzern": "Flag_of_Canton_of_Lucerne.svg"
+    "Luzern": "Flag_of_Canton_of_Lucerne.svg",
+    "Isokyrö / Südösterbotten": "Etel%C3%A4-Pohjanmaan_maakunnan_vaakuna.svg"
   };
 
   const REGION_BY_COUNTRY = {
@@ -80,7 +81,8 @@
     "USA": ["Kentucky", "Indiana", "Pennsylvania", "Washington"],
     "Australien": ["Victoria/ Melbourne"],
     "Kanada": ["Manitoba"],
-    "Schweiz": ["Luzern"]
+    "Schweiz": ["Luzern"],
+    "Finnland": ["Isokyrö / Südösterbotten"]
   };
 
   const originalRegionOptions = Array.from(document.getElementById('editRegion')?.options || []).map(opt => ({value: opt.value, text: opt.textContent || ''}));
