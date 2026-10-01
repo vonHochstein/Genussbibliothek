@@ -310,6 +310,7 @@ function fmtDE(iso) {
     "Leinster": "Flag_of_Leinster.svg",
     "Cork/ Munster": "Flag_of_Munster.svg",
     "County Kerry": "Flag_of_county_Kerry.svg",
+    "County Wicklow / Wicklow Mountains": "County_colors_of_Longford_and_Wicklow_(1x2_ratio).svg",
     "Antrim": "Flag_of_Northern_Ireland.svg",
     "County Down": "Flag_of_county_Down.svg",
     "Cognac": "Flag_of_France.svg",
@@ -325,7 +326,7 @@ function fmtDE(iso) {
   const REGION_BY_COUNTRY = {
     "Deutschland": ["Baden-Württemberg", "Bayern", "Berlin", "Brandenburg", "Bremen", "Hamburg", "Hessen", "Mecklenburg-Vorpommern", "Niedersachsen", "Nordrhein-Westfalen", "Rheinland-Pfalz", "Saarland", "Sachsen", "Sachsen-Anhalt", "Schleswig-Holstein", "Thüringen"],
     "Schottland": ["Highlands", "Speyside", "Lowlands", "Islay", "Islands", "Campbeltown"],
-    "Irland": ["Leinster", "Cork/ Munster", "County Kerry"],
+    "Irland": ["Leinster", "Cork/ Munster", "County Kerry", "County Wicklow / Wicklow Mountains"],
     "Nordirland": ["Antrim", "County Down"],
     "Frankreich": ["Cognac"],
     "USA": ["Kentucky", "Indiana", "Pennsylvania", "Washington"],
