@@ -259,6 +259,7 @@ function fmtDE(iso) {
   const COUNTRY_FLAG_MAP = {
     "Deutschland": "Flag_of_Germany.svg",
     "Schottland": "Flag_of_the_United_Kingdom.svg",
+    "England": "Flag_of_England.svg",
     "Nordirland": "Flag_of_the_United_Kingdom.svg",
     "Irland": "Flag_of_Ireland.svg",
     "Frankreich": "Flag_of_France.svg",
@@ -268,6 +269,7 @@ function fmtDE(iso) {
     "USA": "Flag_of_the_United_States.svg",
     "Japan": "Flag_of_Japan.svg",
     "Australien": "Flag_of_Australia.svg",
+    "Neuseeland": "Flag_of_New_Zealand.svg",
     "Kanada": "Flag_of_Canada_(Pantone).svg",
     "Indien": "Flag_of_India.svg",
     "Schweiz": "Flag_of_Switzerland.svg",
@@ -298,6 +300,7 @@ function fmtDE(iso) {
     "Islay": "Flag_of_Scotland.svg",
     "Islands": "Flag_of_Scotland.svg",
     "Campbeltown": "Flag_of_Scotland.svg",
+    "Cumbria / Lake District": "Community_flag_of_Cumbria.svg",
     "Leinster": "Flag_of_Leinster.svg",
     "Cork/ Munster": "Flag_of_Munster.svg",
     "County Kerry": "Flag_of_county_Kerry.svg",
@@ -306,23 +309,26 @@ function fmtDE(iso) {
     "County Down": "Flag_of_county_Down.svg",
     "Cognac": "Flag_of_France.svg",
     "Victoria/ Melbourne": "Flag_of_Victoria_(Australia).svg",
+    "Marlborough": "Flag_of_New_Zealand.svg",
     "Kentucky": "Flag_of_Kentucky.svg",
     "Indiana": "Flag_of_Indiana.svg",
     "Pennsylvania": "Flag_of_Pennsylvania.svg",
     "Washington": "Flag_of_Washington.svg",
     "Manitoba": "Flag_of_Canada_(Pantone).svg",
     "Luzern": "Flag_of_Canton_of_Lucerne.svg",
-    "Isokyrö / Südösterbotten": "Etel%C3%A4-Pohjanmaan_maakunnan_vaakuna.svg"
+    "Isokyrö / Südösterbotten": "Flag_of_Southern_Ostrobothnia.svg"
   };
 
   const REGION_BY_COUNTRY = {
     "Deutschland": ["Baden-Württemberg", "Bayern", "Berlin", "Brandenburg", "Bremen", "Hamburg", "Hessen", "Mecklenburg-Vorpommern", "Niedersachsen", "Nordrhein-Westfalen", "Rheinland-Pfalz", "Saarland", "Sachsen", "Sachsen-Anhalt", "Schleswig-Holstein", "Thüringen"],
     "Schottland": ["Highlands", "Speyside", "Lowlands", "Islay", "Islands", "Campbeltown"],
+    "England": ["Cumbria / Lake District"],
     "Irland": ["Leinster", "Cork/ Munster", "County Kerry", "County Wicklow / Wicklow Mountains"],
     "Nordirland": ["Antrim", "County Down"],
     "Frankreich": ["Cognac"],
     "USA": ["Kentucky", "Indiana", "Pennsylvania", "Washington"],
     "Australien": ["Victoria/ Melbourne"],
+    "Neuseeland": ["Marlborough"],
     "Kanada": ["Manitoba"],
     "Schweiz": ["Luzern"],
     "Finnland": ["Isokyrö / Südösterbotten"]
