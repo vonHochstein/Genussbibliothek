@@ -152,6 +152,12 @@ const WORLD_MAP_CONFIG = {
     focusViewBox: "1040 360 250 150",
     statusLabel: "Australien",
     entryCountries: ["Australien"]
+  },
+  "Neuseeland": {
+    selectors: ["#nz", "g#nz", "[id='nz']", "[class~='nz']", "[name='nz']", "[inkscape\\:label='nz']", "[title='New Zealand']", "[aria-label='New Zealand']"],
+    focusViewBox: "1190 390 180 170",
+    statusLabel: "Neuseeland",
+    entryCountries: ["Neuseeland"]
   }
 };
 
