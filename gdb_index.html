@@ -14,6 +14,7 @@
 <link rel="stylesheet" href="gdb_stockbar.css">
 <link rel="stylesheet" href="gdb_pli.css">
 <link rel="stylesheet" href="views/gin/gdb_gin_shell.css">
+<link rel="stylesheet" href="views/beer/gdb_beer_shell.css">
 
 
 <div class="topbar app-topbar" style="display:none;">
@@ -130,10 +131,10 @@
       <div class="hint">folgt...</div>
     </div>
 
-    <div class="card tile" title="Kommt als Nächstes">
-      <img src="icons/bier_384.png" alt="">
+    <div id="tileBier" class="card tile" title="Bier-Übersicht &amp; Detailansichten">
+      <img src="icons/bier_384.png" alt="Bier">
       <h3>Bier</h3>
-      <div class="hint">folgt...</div>
+      <div class="hint" id="tileStatBier">Lade Daten…</div>
     </div>
 
     <div class="card tile" title="Kommt als Nächstes">
@@ -227,6 +228,58 @@
 
   <p id="ginMsg" class="" style="margin-top:0; margin-bottom:0"></p>
   <iframe id="ginFrame" class="view-frame" src="" loading="lazy"></iframe>
+</div>
+
+<!-- Bier (bis zur Datenbankfreigabe im Shell-Modul gesperrt) -->
+<div id="beerListView" class="view hidden">
+  <div class="card">
+    <div class="view-header">
+      <h3 id="beerViewTitle">Bier</h3>
+      <button id="backToDashFromBierBtn" class="btn" type="button">Zurück</button>
+    </div>
+    <p id="beerLoginOk" class="ok" style="margin-top:0; margin-bottom:10px"></p>
+
+    <div class="beer-toolbar card" style="margin-top:1px; padding:10px;">
+      <div class="toolbar-block"><div id="beerCount" class="muted">0 Biere</div></div>
+      <div class="toolbar-block">
+        <input id="beerSearch" type="text" placeholder="Bier suchen…" autocomplete="off" style="width:100%;">
+      </div>
+      <div class="toolbar-block" style="display:flex; gap:8px; align-items:center;">
+        <select id="beerSort" style="width:100%;">
+          <option value="name">Name</option>
+          <option value="rating_avg">Bewertung (Ø)</option>
+          <option value="rating_user">Meine Bewertung</option>
+          <option value="pli_avg">PLI (Ø)</option>
+          <option value="pli_user">Mein PLI</option>
+          <option value="price">Preis</option>
+          <option value="created">erstellt</option>
+          <option value="updated">geändert</option>
+        </select>
+        <button id="beerSortDir" class="btn" type="button" title="Sortierreihenfolge umschalten" aria-label="Sortierreihenfolge absteigend">↓</button>
+      </div>
+      <div class="toolbar-block beer-filter-tools">
+        <details id="beerFilterMenu" class="beer-filter-menu">
+          <summary id="beerFilterSummary">Filter</summary>
+          <div class="beer-filter-menu-panel">
+            <label><input type="checkbox" id="beerFilterOwnStock"><span>Nur eigener Bestand</span></label>
+            <label><input type="checkbox" id="beerFilterCollector"><span>Nur Sammlerstücke / Sondereditionen</span></label>
+            <label><input type="checkbox" id="beerFilterIncomplete"><span>Nur unvollständige Einträge</span></label>
+            <label><input type="checkbox" id="beerFilterWishlist"><span>Nur Wunschliste</span></label>
+            <label><input type="checkbox" id="beerFilterWithoutImage"><span>Nur Einträge ohne Bild</span></label>
+          </div>
+        </details>
+        <label style="display:flex; align-items:center; gap:6px;">
+          <input type="checkbox" id="beerCompareStock"><span>Bestandsvergleich</span>
+        </label>
+      </div>
+      <div class="toolbar-block" style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button id="btnBierList" class="btn" type="button">Filter Reset</button>
+        <button id="btnNewBier" class="btn" type="button">Neues Bier</button>
+      </div>
+    </div>
+  </div>
+  <p id="beerMsg" class="" style="margin-top:0; margin-bottom:0"></p>
+  <iframe id="beerFrame" class="view-frame" src="" loading="lazy"></iframe>
 </div>
 
 <!-- Whisky (Kartenansicht) -->
@@ -493,10 +546,73 @@
   </div>
 </div>
 
+<!-- Bier PLI Modal -->
+<div id="beerPliModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-beer-modal="beerPliModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="beerPliModalTitle">
+    <div class="modal-header">
+      <h3 id="beerPliModalTitle">Preis-Leistungs-Index (PLI)</h3>
+      <button id="beerPliCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div class="modal-body">
+      <p>Der PLI setzt die persönliche Bewertung und den Preis pro Liter ins Verhältnis. Je höher der Wert, desto mehr bewerteter Genuss entfällt rechnerisch auf den eingesetzten Euro.</p>
+      <p><strong>Formel:</strong> Bewertung ÷ Preis pro Liter</p>
+      <ul class="pli-scale-list">
+        <li><strong>&lt; 0,04</strong> – eher schwaches Preis-Leistungs-Verhältnis</li>
+        <li><strong>0,04–0,07</strong> – eher teuer</li>
+        <li><strong>0,08–0,11</strong> – fair bepreist</li>
+        <li><strong>0,12–0,16</strong> – gutes Preis-Leistungs-Verhältnis</li>
+        <li><strong>&gt; 0,16</strong> – sehr gutes Preis-Leistungs-Verhältnis</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Bier Bewertungen Modal -->
+<div id="beerRatingsModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-beer-modal="beerRatingsModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="beerRatingsModalTitle">
+    <div class="modal-header">
+      <h3 id="beerRatingsModalTitle">Alle Bewertungen</h3>
+      <button id="beerRatingsCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div id="beerRatingsModalContent" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- Bier Bestände Modal -->
+<div id="beerStocksModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-beer-modal="beerStocksModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="beerStocksTitle">
+    <div class="modal-header">
+      <h3 id="beerStocksTitle">Bestände</h3>
+      <button id="beerStocksCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div id="beerStocksBody" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- Bier Bestandsvergleich Modal -->
+<div id="beerCompareStockModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-beer-modal="beerCompareStockModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="beerCompareStockTitle">
+    <div class="modal-header"><h3 id="beerCompareStockTitle">Bestandsvergleich</h3></div>
+    <div class="modal-body">
+      <p class="muted" style="margin-top:0;">Mit welchem Nutzer soll dein Bestand verglichen werden?</p>
+      <div id="beerCompareStockUserList" class="compare-stock-user-list"></div>
+      <div class="row" style="justify-content:flex-end; margin-top:12px;">
+        <button id="beerCompareStockCancelBtn" class="btn modal-close" type="button">Abbrechen</button>
+        <button id="beerCompareStockApplyBtn" class="btn modal-close" type="button">Anwenden</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="gdb_theme.js"></script>
 <script src="gdb_news.js"></script>
 <script src="gdb_permissions.js"></script>
 <script src="gdb_index.js?v=20260924-1"></script>
 <script src="views/gin/gdb_gin_shell.js"></script>
+<script src="views/beer/gdb_beer_shell.js"></script>
 </html>
