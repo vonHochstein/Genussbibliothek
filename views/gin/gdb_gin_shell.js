@@ -168,11 +168,20 @@
     ginLoginOk.textContent = name ? `Angemeldet als: ${name}` : "Angemeldet";
   }
 
+  let tileStatsKey = null;
+  let tileStatsRequestId = 0;
+
   async function loadTileStats() {
-    if (!GIN_RELEASED || !tileStatGin || !window.supabaseClient || !getCurrentUser()) return;
+    const userId = getCurrentUser()?.id;
+    if (!GIN_RELEASED || !tileStatGin || !window.supabaseClient || !userId) return;
+    const canRead = !!window.GdbPermissions?.hasPermission?.("gin", "read");
+    const key = `${userId}:${canRead}`;
+    if (tileStatsKey === key) return;
+    tileStatsKey = key;
+    const requestId = ++tileStatsRequestId;
+    const isCurrent = () => requestId === tileStatsRequestId && getCurrentUser()?.id === userId;
     try {
-      await refreshPermissions();
-      if (!window.GdbPermissions?.hasPermission?.("gin", "read")) {
+      if (!canRead) {
         tileStatGin.textContent = "kein Zugriff";
         return;
       }
@@ -180,14 +189,18 @@
         .from("gdb_gins")
         .select("id", { count: "exact", head: true });
       if (countError) throw countError;
+      if (!isCurrent()) return;
       const { data, error } = await window.supabaseClient.from("gdb_gins").select("country");
       if (error) throw error;
+      if (!isCurrent()) return;
       const countries = new Set((data || []).map((row) => (row.country || "").trim()).filter(Boolean));
       const ginCountValue = Number(count) || 0;
       const ginText = ginCountValue === 1 ? "1 Gin" : `${ginCountValue} Gins`;
       const countryText = countries.size === 1 ? "einem Land" : `${countries.size} Ländern`;
       tileStatGin.textContent = `${ginText} aus ${countryText}`;
     } catch (error) {
+      if (!isCurrent()) return;
+      tileStatsKey = null;
       console.error("Gin-Stats konnten nicht geladen werden:", error);
       tileStatGin.textContent = "Stats nicht verfügbar";
     }
@@ -471,15 +484,29 @@
     }
   });
 
+  window.addEventListener("gdb-permissions-loaded", (event) => {
+    if (!event.detail?.userId || event.detail.userId !== getCurrentUser()?.id) return;
+    if (event.detail.error) {
+      tileStatsKey = null;
+      ++tileStatsRequestId;
+      if (tileStatGin) tileStatGin.textContent = "Stats nicht verfügbar";
+      return;
+    }
+    void loadTileStats();
+  });
+
   window.supabaseClient?.auth?.onAuthStateChange?.((event) => {
     if (event === "SIGNED_OUT") {
+      tileStatsKey = null;
+      ++tileStatsRequestId;
+      if (tileStatGin) tileStatGin.textContent = "Lade Daten…";
       document.body.classList.remove("gin-view-active");
       ginListView?.classList.add("hidden");
       if (ginFrame) ginFrame.setAttribute("src", "");
       closeAllModals();
       return;
     }
-    if (event === "SIGNED_IN" || event === "INITIAL_SESSION") void loadTileStats();
+    // Kachelzahlen erst nach dem App-Nutzerprofil und den geladenen Rechten abrufen.
   });
 
   window.GdbGinShell = Object.freeze({

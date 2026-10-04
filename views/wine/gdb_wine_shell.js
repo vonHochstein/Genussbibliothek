@@ -168,11 +168,20 @@
     wineLoginOk.textContent = name ? `Angemeldet als: ${name}` : "Angemeldet";
   }
 
+  let tileStatsKey = null;
+  let tileStatsRequestId = 0;
+
   async function loadTileStats() {
-    if (!WINE_RELEASED || !tileStatWein || !window.supabaseClient || !getCurrentUser()) return;
+    const userId = getCurrentUser()?.id;
+    if (!WINE_RELEASED || !tileStatWein || !window.supabaseClient || !userId) return;
+    const canRead = !!window.GdbPermissions?.hasPermission?.("wine", "read");
+    const key = `${userId}:${canRead}`;
+    if (tileStatsKey === key) return;
+    tileStatsKey = key;
+    const requestId = ++tileStatsRequestId;
+    const isCurrent = () => requestId === tileStatsRequestId && getCurrentUser()?.id === userId;
     try {
-      await refreshPermissions();
-      if (!window.GdbPermissions?.hasPermission?.("wine", "read")) {
+      if (!canRead) {
         tileStatWein.textContent = "kein Zugriff";
         return;
       }
@@ -180,14 +189,18 @@
         .from("gdb_wines")
         .select("id", { count: "exact", head: true });
       if (countError) throw countError;
+      if (!isCurrent()) return;
       const { data, error } = await window.supabaseClient.from("gdb_wines").select("country");
       if (error) throw error;
+      if (!isCurrent()) return;
       const countries = new Set((data || []).map((row) => (row.country || "").trim()).filter(Boolean));
       const wineCountValue = Number(count) || 0;
       const wineText = wineCountValue === 1 ? "1 Wein" : `${wineCountValue} Weine`;
       const countryText = countries.size === 1 ? "einem Land" : `${countries.size} Ländern`;
       tileStatWein.textContent = `${wineText} aus ${countryText}`;
     } catch (error) {
+      if (!isCurrent()) return;
+      tileStatsKey = null;
       console.error("Wein-Stats konnten nicht geladen werden:", error);
       tileStatWein.textContent = "Stats nicht verfügbar";
     }
@@ -474,15 +487,29 @@
     }
   });
 
+  window.addEventListener("gdb-permissions-loaded", (event) => {
+    if (!event.detail?.userId || event.detail.userId !== getCurrentUser()?.id) return;
+    if (event.detail.error) {
+      tileStatsKey = null;
+      ++tileStatsRequestId;
+      if (tileStatWein) tileStatWein.textContent = "Stats nicht verfügbar";
+      return;
+    }
+    void loadTileStats();
+  });
+
   window.supabaseClient?.auth?.onAuthStateChange?.((event) => {
     if (event === "SIGNED_OUT") {
+      tileStatsKey = null;
+      ++tileStatsRequestId;
+      if (tileStatWein) tileStatWein.textContent = "Lade Daten…";
       document.body.classList.remove("wine-view-active");
       wineListView?.classList.add("hidden");
       if (wineFrame) wineFrame.setAttribute("src", "");
       closeAllModals();
       return;
     }
-    if (event === "SIGNED_IN" || event === "INITIAL_SESSION") void loadTileStats();
+    // Kachelzahlen erst nach dem App-Nutzerprofil und den geladenen Rechten abrufen.
   });
 
   window.GdbWeinShell = Object.freeze({

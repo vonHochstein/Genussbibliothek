@@ -68,6 +68,11 @@
     if (error) {
       console.error("Permissions konnten nicht geladen werden:", error);
       currentPermissions = [];
+      if (getCurrentUser()?.id === effectiveUserId) {
+        window.dispatchEvent(new CustomEvent("gdb-permissions-loaded", {
+          detail: { userId: effectiveUserId, error: true }
+        }));
+      }
       throw error;
     }
 
@@ -75,6 +80,12 @@
       scope: normalize(row.scope),
       perm: normalize(row.perm)
     })) : [];
+
+    if (getCurrentUser()?.id === effectiveUserId) {
+      window.dispatchEvent(new CustomEvent("gdb-permissions-loaded", {
+        detail: { userId: effectiveUserId }
+      }));
+    }
 
     return currentPermissions;
   }
