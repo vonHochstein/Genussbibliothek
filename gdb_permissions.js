@@ -121,7 +121,7 @@
 
 function getAllKnownPermissionsForScope(scope) {
 const normalizedScope = normalize(scope);
-if (normalizedScope === "whisky" || normalizedScope === "gin" || normalizedScope === "beer") {
+if (normalizedScope === "whisky" || normalizedScope === "gin" || normalizedScope === "beer" || normalizedScope === "wine") {
     return ["read", "create", "update", "delete"];
 }
 return uniqueSorted(getPermissionsForScope(scope));
