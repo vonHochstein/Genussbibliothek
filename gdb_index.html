@@ -14,6 +14,8 @@
 <link rel="stylesheet" href="gdb_stockbar.css">
 <link rel="stylesheet" href="gdb_pli.css">
 <link rel="stylesheet" href="views/gin/gdb_gin_shell.css">
+<link rel="stylesheet" href="views/rum/gdb_rum_shell.css">
+<link rel="stylesheet" href="views/cigar/gdb_cigar_shell.css">
 <link rel="stylesheet" href="views/beer/gdb_beer_shell.css">
 <link rel="stylesheet" href="views/wine/gdb_wine_shell.css">
 
@@ -114,10 +116,10 @@
       <div class="hint" id="tileStatGin">Lade Daten…</div>
     </div>
 
-    <div class="card tile" title="Kommt als Nächstes">
-      <img src="icons/rum_384.png" alt="">
+    <div id="tileRum" class="card tile" title="Rum öffnen">
+      <img src="icons/rum_384.png" alt="Rum">
       <h3>Rum</h3>
-      <div class="hint">folgt...</div>
+      <div class="hint" id="tileStatRum">Lade Daten…</div>
     </div>
 
     <div id="tileWein" class="card tile" title="Wein- und Schaumwein-Übersicht &amp; Detailansichten">
@@ -138,10 +140,10 @@
       <div class="hint" id="tileStatBier">Lade Daten…</div>
     </div>
 
-    <div class="card tile" title="Kommt als Nächstes">
-      <img src="icons/zigarren_384.png" alt="">
+    <div id="tileCigar" class="card tile" title="Zigarren öffnen">
+      <img src="icons/zigarren_384.png" alt="Zigarren">
       <h3>Zigarren</h3>
-      <div class="hint">folgt...</div>
+      <div class="hint" id="tileStatCigar">Lade Daten…</div>
     </div>
 
     <div class="card tile" title="Kommt als Nächstes">
@@ -229,6 +231,148 @@
 
   <p id="ginMsg" class="" style="margin-top:0; margin-bottom:0"></p>
   <iframe id="ginFrame" class="view-frame" src="" loading="lazy"></iframe>
+</div>
+
+<!-- Rum -->
+<div id="rumListView" class="view hidden">
+  <div class="card">
+    <div class="view-header">
+      <h3 id="rumViewTitle">Rum</h3>
+      <button id="backToDashFromRumBtn" class="btn" type="button">Zurück</button>
+    </div>
+    <p id="rumLoginOk" class="ok" style="margin-top:0; margin-bottom:10px"></p>
+
+    <div class="rum-toolbar card" style="margin-top:1px; padding:10px;">
+      <div class="toolbar-block">
+        <div id="rumCount" class="muted">0 Rums</div>
+      </div>
+      <div class="toolbar-block">
+        <input id="rumSearch" type="text" placeholder="Rum suchen…" autocomplete="off" style="width:100%;">
+      </div>
+      <div class="toolbar-block" style="display:flex; gap:8px; align-items:center;">
+        <select id="rumSort" style="width:100%;">
+          <option value="name">Name</option>
+          <option value="rating_avg">Bewertung (Ø)</option>
+          <option value="rating_user">Meine Bewertung</option>
+          <option value="pli_avg">PLI (Ø)</option>
+          <option value="pli_user">Mein PLI</option>
+          <option value="price">Preis</option>
+          <option value="created">erstellt</option>
+          <option value="updated">geändert</option>
+        </select>
+        <button id="rumSortDir" class="btn" type="button" title="Sortierreihenfolge umschalten" aria-label="Sortierreihenfolge absteigend">↓</button>
+      </div>
+      <div class="toolbar-block rum-filter-tools">
+        <details id="rumFilterMenu" class="rum-filter-menu">
+          <summary id="rumFilterSummary">Filter</summary>
+          <div class="rum-filter-menu-panel">
+            <label>
+              <input type="checkbox" id="rumFilterOwnStock">
+              <span>Nur eigener Bestand</span>
+            </label>
+            <label>
+              <input type="checkbox" id="rumFilterCollector">
+              <span>Nur Sammlerflaschen</span>
+            </label>
+            <label>
+              <input type="checkbox" id="rumFilterIncomplete">
+              <span>Nur unvollständige Einträge</span>
+            </label>
+            <label>
+              <input type="checkbox" id="rumFilterWishlist">
+              <span>Nur Wunschliste</span>
+            </label>
+            <label>
+              <input type="checkbox" id="rumFilterWithoutImage">
+              <span>Nur Einträge ohne Bild</span>
+            </label>
+          </div>
+        </details>
+        <label style="display:flex; align-items:center; gap:6px;">
+          <input type="checkbox" id="rumCompareStock">
+          <span>Bestandsvergleich</span>
+        </label>
+      </div>
+      <div class="toolbar-block" style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button id="btnRumList" class="btn" type="button">Filter Reset</button>
+        <button id="btnNewRum" class="btn" type="button">Neuer Rum</button>
+      </div>
+    </div>
+  </div>
+
+  <p id="rumMsg" class="" style="margin-top:0; margin-bottom:0"></p>
+  <iframe id="rumFrame" class="view-frame" src="" loading="lazy"></iframe>
+</div>
+
+<!-- Cigar -->
+<div id="cigarListView" class="view hidden">
+  <div class="card">
+    <div class="view-header">
+      <h3 id="cigarViewTitle">Zigarren</h3>
+      <button id="backToDashFromCigarBtn" class="btn" type="button">Zurück</button>
+    </div>
+    <p id="cigarLoginOk" class="ok" style="margin-top:0; margin-bottom:10px"></p>
+
+    <div class="cigar-toolbar card" style="margin-top:1px; padding:10px;">
+      <div class="toolbar-block">
+        <div id="cigarCount" class="muted">0 Zigarren</div>
+      </div>
+      <div class="toolbar-block">
+        <input id="cigarSearch" type="text" placeholder="Zigarren suchen…" autocomplete="off" style="width:100%;">
+      </div>
+      <div class="toolbar-block" style="display:flex; gap:8px; align-items:center;">
+        <select id="cigarSort" style="width:100%;">
+          <option value="name">Name</option>
+          <option value="rating_avg">Bewertung (Ø)</option>
+          <option value="rating_user">Meine Bewertung</option>
+          <option value="pli_avg">PLI (Ø)</option>
+          <option value="pli_user">Mein PLI</option>
+          <option value="price">Preis</option>
+          <option value="created">erstellt</option>
+          <option value="updated">geändert</option>
+        </select>
+        <button id="cigarSortDir" class="btn" type="button" title="Sortierreihenfolge umschalten" aria-label="Sortierreihenfolge absteigend">↓</button>
+      </div>
+      <div class="toolbar-block cigar-filter-tools">
+        <details id="cigarFilterMenu" class="cigar-filter-menu">
+          <summary id="cigarFilterSummary">Filter</summary>
+          <div class="cigar-filter-menu-panel">
+            <label>
+              <input type="checkbox" id="cigarFilterOwnStock">
+              <span>Nur eigener Bestand</span>
+            </label>
+            <label>
+              <input type="checkbox" id="cigarFilterCollector">
+              <span>Nur Sammlerstück / Sondereditionn</span>
+            </label>
+            <label>
+              <input type="checkbox" id="cigarFilterIncomplete">
+              <span>Nur unvollständige Einträge</span>
+            </label>
+            <label>
+              <input type="checkbox" id="cigarFilterWishlist">
+              <span>Nur Wunschliste</span>
+            </label>
+            <label>
+              <input type="checkbox" id="cigarFilterWithoutImage">
+              <span>Nur Einträge ohne Bild</span>
+            </label>
+          </div>
+        </details>
+        <label style="display:flex; align-items:center; gap:6px;">
+          <input type="checkbox" id="cigarCompareStock">
+          <span>Bestandsvergleich</span>
+        </label>
+      </div>
+      <div class="toolbar-block" style="display:flex; gap:8px; flex-wrap:wrap;">
+        <button id="btnCigarList" class="btn" type="button">Filter Reset</button>
+        <button id="btnNewCigar" class="btn" type="button">Neue Zigarre</button>
+      </div>
+    </div>
+  </div>
+
+  <p id="cigarMsg" class="" style="margin-top:0; margin-bottom:0"></p>
+  <iframe id="cigarFrame" class="view-frame" src="" loading="lazy"></iframe>
 </div>
 
 <!-- Bier (bis zur Datenbankfreigabe im Shell-Modul gesperrt) -->
@@ -601,6 +745,68 @@
   </div>
 </div>
 
+<!-- Rum Modals -->
+<div id="rumPliModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-rum-modal="rumPliModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="rumPliModalTitle">
+    <div class="modal-header">
+      <h3 id="rumPliModalTitle">Preis-Leistungs-Index (PLI)</h3>
+      <button id="rumPliCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div class="modal-body">
+      <p>Der PLI setzt die persönliche Bewertung und den Preis pro Liter ins Verhältnis. Je höher der Wert, desto mehr bewerteter Genuss entfällt rechnerisch auf den eingesetzten Euro.</p>
+      <p><strong>Formel:</strong> Bewertung ÷ Preis pro Liter</p>
+      <ul class="pli-scale-list">
+        <li><strong>&lt; 0,04</strong> – eher schwaches Preis-Leistungs-Verhältnis</li>
+        <li><strong>0,04–0,07</strong> – eher teuer</li>
+        <li><strong>0,08–0,11</strong> – fair bepreist</li>
+        <li><strong>0,12–0,16</strong> – gutes Preis-Leistungs-Verhältnis</li>
+        <li><strong>&gt; 0,16</strong> – sehr gutes Preis-Leistungs-Verhältnis</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- Rum Bewertungen Modal -->
+<div id="rumRatingsModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-rum-modal="rumRatingsModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="rumRatingsModalTitle">
+    <div class="modal-header">
+      <h3 id="rumRatingsModalTitle">Alle Bewertungen</h3>
+      <button id="rumRatingsCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div id="rumRatingsModalContent" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- Rum Bestände Modal -->
+<div id="rumStocksModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-rum-modal="rumStocksModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="rumStocksTitle">
+    <div class="modal-header">
+      <h3 id="rumStocksTitle">Bestände</h3>
+      <button id="rumStocksCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div id="rumStocksBody" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- Rum Bestandsvergleich Modal -->
+<div id="rumCompareStockModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-rum-modal="rumCompareStockModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="rumCompareStockTitle">
+    <div class="modal-header"><h3 id="rumCompareStockTitle">Bestandsvergleich</h3></div>
+    <div class="modal-body">
+      <p class="muted" style="margin-top:0;">Mit welchem Nutzer soll dein Bestand verglichen werden?</p>
+      <div id="rumCompareStockUserList" class="compare-stock-user-list"></div>
+      <div class="row" style="justify-content:flex-end; margin-top:12px;">
+        <button id="rumCompareStockCancelBtn" class="btn modal-close" type="button">Abbrechen</button>
+        <button id="rumCompareStockApplyBtn" class="btn modal-close" type="button">Anwenden</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- Bier PLI Modal -->
 <div id="beerPliModal" class="modal hidden" aria-hidden="true">
   <div class="modal-backdrop" data-close-beer-modal="beerPliModal"></div>
@@ -623,6 +829,63 @@
   </div>
 </div>
 
+<!-- Cigar Modals -->
+<div id="cigarPliModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-cigar-modal="cigarPliModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="cigarPliModalTitle">
+    <div class="modal-header">
+      <h3 id="cigarPliModalTitle">Preis-Leistungs-Index (PLI)</h3>
+      <button id="cigarPliCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div class="modal-body">
+      <p>Der PLI setzt die persönliche Bewertung und den Preis je Zigarre ins Verhältnis. Je höher der Wert, desto mehr bewerteter Genuss entfällt rechnerisch auf den eingesetzten Euro.</p>
+      <p><strong>Formel:</strong> Bewertung ÷ Preis je Zigarre</p>
+      <p>Bei fehlender Bewertung oder unbekanntem beziehungsweise 0 € Stückpreis bleibt der PLI leer. Die Skala der Karten richtet sich nach den vorhandenen Zigarrenwerten; sie ist nicht mit dem Literpreis-PLI der Getränke vergleichbar.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Cigar Bewertungen Modal -->
+<div id="cigarRatingsModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-cigar-modal="cigarRatingsModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="cigarRatingsModalTitle">
+    <div class="modal-header">
+      <h3 id="cigarRatingsModalTitle">Alle Bewertungen</h3>
+      <button id="cigarRatingsCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div id="cigarRatingsModalContent" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- Cigar Bestände Modal -->
+<div id="cigarStocksModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-cigar-modal="cigarStocksModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="cigarStocksTitle">
+    <div class="modal-header">
+      <h3 id="cigarStocksTitle">Bestände</h3>
+      <button id="cigarStocksCloseBtn" class="btn modal-close" type="button">Schließen</button>
+    </div>
+    <div id="cigarStocksBody" class="modal-body"></div>
+  </div>
+</div>
+
+<!-- Cigar Bestandsvergleich Modal -->
+<div id="cigarCompareStockModal" class="modal hidden" aria-hidden="true">
+  <div class="modal-backdrop" data-close-cigar-modal="cigarCompareStockModal"></div>
+  <div class="modal-card card" role="dialog" aria-modal="true" aria-labelledby="cigarCompareStockTitle">
+    <div class="modal-header"><h3 id="cigarCompareStockTitle">Bestandsvergleich</h3></div>
+    <div class="modal-body">
+      <p class="muted" style="margin-top:0;">Mit welchem Nutzer soll dein Bestand verglichen werden?</p>
+      <div id="cigarCompareStockUserList" class="compare-stock-user-list"></div>
+      <div class="row" style="justify-content:flex-end; margin-top:12px;">
+        <button id="cigarCompareStockCancelBtn" class="btn modal-close" type="button">Abbrechen</button>
+        <button id="cigarCompareStockApplyBtn" class="btn modal-close" type="button">Anwenden</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Bier PLI Modal -->
 <!-- Bier Bewertungen Modal -->
 <div id="beerRatingsModal" class="modal hidden" aria-hidden="true">
   <div class="modal-backdrop" data-close-beer-modal="beerRatingsModal"></div>
@@ -728,9 +991,11 @@
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="gdb_theme.js"></script>
 <script src="gdb_news.js"></script>
-<script src="gdb_permissions.js?v=20261004-3"></script>
+<script src="gdb_permissions.js?v=20261005-2"></script>
 <script src="gdb_index.js?v=20260924-1"></script>
 <script src="views/gin/gdb_gin_shell.js?v=20261004-3"></script>
+<script src="views/rum/gdb_rum_shell.js?v=20261005-2"></script>
+<script src="views/cigar/gdb_cigar_shell.js?v=20261005-2"></script>
 <script src="views/beer/gdb_beer_shell.js?v=20261004-3"></script>
 <script src="views/wine/gdb_wine_shell.js?v=20261004-3"></script>
 </html>

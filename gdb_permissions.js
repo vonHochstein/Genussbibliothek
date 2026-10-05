@@ -42,6 +42,7 @@
     const key = normalize(scope);
     if (key === "whisky") return "Whisky";
     if (key === "gin") return "Gin";
+    if (key === "rum") return "Rum";
     if (key === "beer") return "Bier";
     if (key === "wine") return "Wein";
     if (key === "cigar") return "Zigarren";
@@ -132,7 +133,7 @@
 
 function getAllKnownPermissionsForScope(scope) {
 const normalizedScope = normalize(scope);
-if (normalizedScope === "whisky" || normalizedScope === "gin" || normalizedScope === "beer" || normalizedScope === "wine") {
+if (normalizedScope === "whisky" || normalizedScope === "gin" || normalizedScope === "beer" || normalizedScope === "wine" || normalizedScope === "rum" || normalizedScope === "cigar") {
     return ["read", "create", "update", "delete"];
 }
 return uniqueSorted(getPermissionsForScope(scope));
