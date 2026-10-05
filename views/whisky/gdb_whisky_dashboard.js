@@ -129,6 +129,11 @@ const WORLD_MAP_CONFIG = {
     statusLabel: "Spanien",
     entryCountries: ["Spanien"]
   },
+  "Kolumbien": {
+    selectors: ["#co", "g#co", "[id='co']", "[class~='co']", "[name='co']", "[inkscape\\:label='co']", "[title='Colombia']", "[aria-label='Colombia']"],
+    statusLabel: "Kolumbien",
+    entryCountries: ["Kolumbien"]
+  },
   "Kanada": {
     selectors: ["#ca", "g#ca", "[id='ca']", "[class~='ca']", "[name='ca']", "[inkscape\\:label='ca']", "[title='Canada']", "[aria-label='Canada']"],
     focusViewBox: "80 55 320 160",

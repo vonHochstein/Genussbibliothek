@@ -15,6 +15,7 @@
 
   const COUNTRY_FLAG_MAP = {
     "Deutschland": "Flag_of_Germany.svg",
+    "Kolumbien": "Flag_of_Colombia.svg",
     "Schottland": "Flag_of_the_United_Kingdom.svg",
     "England": "Flag_of_England.svg",
     "Nordirland": "Flag_of_the_United_Kingdom.svg",
