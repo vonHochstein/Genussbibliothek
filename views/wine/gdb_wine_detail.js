@@ -325,6 +325,8 @@ function fmtDE(iso) {
   };
 
   const REGION_FLAG_MAP = {
+    // Keine eigene Flagge des länderübergreifenden Weinbaugebiets: Landesflagge als Fallback.
+    "Saale-Unstrut": "Flag_of_Germany.svg",
     "Baden-Württemberg": "Flag_of_Baden-W%C3%BCrttemberg.svg",
     "Bayern": "Flag_of_Bavaria_(lozengy).svg",
     "Berlin": "Flag_of_Berlin.svg",
@@ -367,7 +369,7 @@ function fmtDE(iso) {
   };
 
   const REGION_BY_COUNTRY = {
-    "Deutschland": ["Baden-Württemberg", "Bayern", "Berlin", "Brandenburg", "Bremen", "Hamburg", "Hessen", "Mecklenburg-Vorpommern", "Niedersachsen", "Nordrhein-Westfalen", "Rheinland-Pfalz", "Saarland", "Sachsen", "Sachsen-Anhalt", "Schleswig-Holstein", "Thüringen"],
+    "Deutschland": ["Baden-Württemberg", "Bayern", "Berlin", "Brandenburg", "Bremen", "Hamburg", "Hessen", "Mecklenburg-Vorpommern", "Niedersachsen", "Nordrhein-Westfalen", "Rheinland-Pfalz", "Saarland", "Sachsen", "Sachsen-Anhalt", "Schleswig-Holstein", "Thüringen", "Saale-Unstrut"],
     "Schottland": ["Highlands", "Speyside", "Lowlands", "Islay", "Islands", "Campbeltown"],
     "England": ["Cumbria / Lake District"],
     "Irland": ["Leinster", "Cork/ Munster", "County Kerry", "County Wicklow / Wicklow Mountains"],
