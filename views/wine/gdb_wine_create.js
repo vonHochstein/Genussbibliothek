@@ -44,6 +44,7 @@
 
   const REGION_FLAG_MAP = {
     "Apulien": "Flag_of_Apulia.svg",
+    "Venetien": "Flag_of_Veneto.svg",
     // Keine eigene Flagge des länderübergreifenden Weinbaugebiets: Landesflagge als Fallback.
     "Saale-Unstrut": "Flag_of_Germany.svg",
     "Baden-Württemberg": "Flag_of_Baden-W%C3%BCrttemberg.svg",
@@ -94,7 +95,7 @@
     "Irland": ["Leinster", "Cork/ Munster", "County Kerry", "County Wicklow / Wicklow Mountains"],
     "Nordirland": ["Antrim", "County Down"],
     "Frankreich": ["Cognac"],
-    "Italien": ["Apulien"],
+    "Italien": ["Apulien", "Venetien"],
     "USA": ["Kentucky", "Indiana", "Pennsylvania", "Washington"],
     "Australien": ["Victoria/ Melbourne"],
     "Neuseeland": ["Marlborough"],
