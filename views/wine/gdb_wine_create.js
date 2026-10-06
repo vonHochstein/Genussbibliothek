@@ -24,6 +24,7 @@
     "Niederlande": "Flag_of_the_Netherlands.svg",
     "Belgien": "Flag_of_Belgium.svg",
     "Spanien": "Flag_of_Spain.svg",
+    "Portugal": "Flag_of_Portugal.svg",
     "Österreich": "Flag_of_Austria.svg",
     "Tschechien": "Flag_of_the_Czech_Republic.svg",
     "Dänemark": "Flag_of_Denmark.svg",
@@ -43,6 +44,8 @@
   };
 
   const REGION_FLAG_MAP = {
+    // Für das Weinbaugebiet Dão ist hier die Landesflagge als Ersatz hinterlegt.
+    "Dão": "Flag_of_Portugal.svg",
     "Apulien": "Flag_of_Apulia.svg",
     "Venetien": "Flag_of_Veneto.svg",
     "Emilia-Romagna": "Flag_of_Emilia-Romagna_(de_facto).svg",
@@ -97,6 +100,7 @@
     "Nordirland": ["Antrim", "County Down"],
     "Frankreich": ["Cognac"],
     "Italien": ["Apulien", "Venetien", "Emilia-Romagna"],
+    "Portugal": ["Dão"],
     "USA": ["Kentucky", "Indiana", "Pennsylvania", "Washington"],
     "Australien": ["Victoria/ Melbourne"],
     "Neuseeland": ["Marlborough"],
